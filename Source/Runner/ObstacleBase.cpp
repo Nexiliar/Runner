@@ -15,6 +15,7 @@ AObstacleBase::AObstacleBase()
 	RootComponent = SceneComp;
 
 	ObstacleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("OBstacle"));
+	
 	ObstacleMesh->OnComponentHit.AddDynamic(this, &AObstacleBase::OnComponentHit);
 	ObstacleMesh->SetupAttachment(RootComponent);
 }

@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "PickUpBase.h"
 #include "RunnerGameMode.h"
 
-#include "PickUpBase.h"
 
 // Sets default values
 APickUpBase::APickUpBase()

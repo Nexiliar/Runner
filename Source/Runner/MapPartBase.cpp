@@ -105,9 +105,18 @@ void AMapPartBase::SpawnPickUp()
 
 void AMapPartBase::SpawnObstacle(bool TwoObjects)
 {
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+
+	FRotator Rot = GetActorRotation();
+
+
+
 	int8 RandObstacleType = FMath::RandRange(0, Obstacles.Num()-1);
 	FVector SpawnLocation = SpawnRules();
-	AObstacleBase* Obstacle = Cast<AObstacleBase>(GetWorld()->SpawnActor(Obstacles[RandObstacleType], &SpawnLocation));
+	AObstacleBase* Obstacle = Cast<AObstacleBase>(GetWorld()->SpawnActor(Obstacles[RandObstacleType], &SpawnLocation, &Rot, SpawnParams));
 
 	if (TwoObjects)
 	{
