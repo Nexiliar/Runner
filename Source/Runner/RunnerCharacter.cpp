@@ -169,13 +169,15 @@ bool ARunnerCharacter::CanSwitchLane(bool SwitchSide)
 	Hit = GetWorld()->LineTraceSingleByChannel(HitResult, SpawnLocation, RightVector, ECollisionChannel::ECC_Visibility);	
 	if (!Hit)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NotHit"));
+		
 		FVector EndUpLocation(60.0f, 0.0f, 0.0f);
 		SpawnLocation -= EndUpLocation;
 		Hit = GetWorld()->LineTraceSingleByChannel(HitResult, SpawnLocation, RightVector, ECollisionChannel::ECC_Visibility);
-		DrawDebugLine(GetWorld(), SpawnLocation, RightVector, FColor::Green, false, 50.0f);
+		if (Debug)
+			DrawDebugLine(GetWorld(), SpawnLocation, RightVector, FColor::Green, false, 50.0f);
 	}
-	DrawDebugLine(GetWorld(), SpawnLocation, RightVector, FColor::Blue,false,50.0f);
+	if (Debug)
+		DrawDebugLine(GetWorld(), SpawnLocation, RightVector, FColor::Blue,false,50.0f);
 	return Hit;
 }
 //Simple ChangeSpeedFunc 

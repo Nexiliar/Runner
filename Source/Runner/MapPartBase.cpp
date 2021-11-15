@@ -77,8 +77,7 @@ void AMapPartBase::Spawn()
 		{			
 			SpawnObstacle(true);			
 		}			
-	}
-	
+	}	
 	if(SpawnChance<= 90)
 	SpawnPickUp();
 	
@@ -113,64 +112,67 @@ void AMapPartBase::SpawnObstacle(bool TwoObjects)
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = GetInstigator();
-
 	FRotator Rot = GetActorRotation();
-
-
 
 	int8 RandObstacleType = FMath::RandRange(0, Obstacles.Num()-1);
 	FVector SpawnLocation = SpawnRules();
-	AObstacleBase* Obstacle = Cast<AObstacleBase>(GetWorld()->SpawnActor(Obstacles[RandObstacleType], &SpawnLocation, &Rot, SpawnParams));
-	if (Obstacle)
-	{
-		Obstacle->SetLifeSpan(LifeTime);
-	}
-	if (TwoObjects)
-	{
-		SpawnObstacle(false);
-	}	
+	
+
+		AObstacleBase* Obstacle = Cast<AObstacleBase>(GetWorld()->SpawnActor(Obstacles[RandObstacleType], &SpawnLocation, &Rot, SpawnParams));
+		if (Obstacle)
+		{
+			Obstacle->SetLifeSpan(LifeTime);
+
+		}
+		if (TwoObjects)
+		{
+			SpawnObstacle(false);
+		}
+
+
 }
 
 FVector AMapPartBase::SpawnRules()
 {	
-	int8 RandSpawnLane = FMath::RandRange(1, 3);
-	FVector Loc;
+	int8 RandSpawnLane = FMath::RandRange(1, 3);	
 	if (RandSpawnLane == 1)
 	{
 		if (OccupiedLanes[0] == false)
 		{
-			Loc = Left->GetComponentLocation();
+			LocactionForSpawn = Left->GetComponentLocation();
 			OccupiedLanes[0] = true;
 		}
 		else
 		{
-			SpawnRules();
+			LocactionForSpawn = SpawnRules();
 		}
 	}
-	else if (RandSpawnLane == 2 && OccupiedLanes[1] != true)
+	else if (RandSpawnLane == 2)
 	{
 		if (OccupiedLanes[1] == false)
 		{
-			Loc = Mid->GetComponentLocation();
+			LocactionForSpawn = Mid->GetComponentLocation();
 			OccupiedLanes[1] = true;
 		}
 		else
 		{
-			SpawnRules();
+			LocactionForSpawn = SpawnRules();
 		}
 	}
-	else if (RandSpawnLane == 3 && OccupiedLanes[2] != true)
+	else if (RandSpawnLane == 3)
 	{
 		if (OccupiedLanes[2] == false)
 		{
-			Loc = Right->GetComponentLocation();
+			LocactionForSpawn = Right->GetComponentLocation();
 			OccupiedLanes[2] = true;
 		}
 		else
 		{
-			SpawnRules();
+			LocactionForSpawn = SpawnRules();
 		}
 	}
-	return Loc;
+
+	//UE_LOG(LogTemp, Warning, TEXT("Location %s"), *LocactionForSpawn.ToString());
+	return LocactionForSpawn;
 }
 

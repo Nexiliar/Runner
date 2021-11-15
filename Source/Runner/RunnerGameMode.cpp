@@ -35,14 +35,12 @@ void ARunnerGameMode::BeginPlay()
 void ARunnerGameMode::SpawnMapPart()
 {	
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;	
 
 	AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(MapPart, &SpawnPoint, SpawnParams));
 	if (MapPart)
 	{		
-		FVector Location = NewPart->ArrowComp->GetComponentLocation();
-		
+		FVector Location = NewPart->ArrowComp->GetComponentLocation();		
 		SpawnPoint.SetLocation(Location);
 	}
 }

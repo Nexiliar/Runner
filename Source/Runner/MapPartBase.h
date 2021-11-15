@@ -61,7 +61,7 @@ public:
 	FVector SpawnRules();
 	TArray<bool> OccupiedLanes;
 	
-	
+	FVector LocactionForSpawn;
 	//PickUp Classess to randomly spawn on tile
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
 		TArray<TSubclassOf<class APickUpBase>> PickUps;
