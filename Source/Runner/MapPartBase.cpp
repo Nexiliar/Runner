@@ -99,6 +99,10 @@ void AMapPartBase::SpawnPickUp()
 		{
 			Loc += StepBetweenCoins;
 			APickUpBase* Coin = Cast<APickUpBase>(GetWorld()->SpawnActor(PickUps[RandPickUpType], &Loc));
+			if (Coin)
+			{
+				Coin->SetLifeSpan(LifeTime);
+			}
 		}
 	}	
 }
@@ -117,7 +121,10 @@ void AMapPartBase::SpawnObstacle(bool TwoObjects)
 	int8 RandObstacleType = FMath::RandRange(0, Obstacles.Num()-1);
 	FVector SpawnLocation = SpawnRules();
 	AObstacleBase* Obstacle = Cast<AObstacleBase>(GetWorld()->SpawnActor(Obstacles[RandObstacleType], &SpawnLocation, &Rot, SpawnParams));
-
+	if (Obstacle)
+	{
+		Obstacle->SetLifeSpan(LifeTime);
+	}
 	if (TwoObjects)
 	{
 		SpawnObstacle(false);

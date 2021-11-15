@@ -197,9 +197,13 @@ void ARunnerCharacter::ChangeSpeed()
 //ChangeSpeed OverTime
 void ARunnerCharacter::OverTime()
 {
-	GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
-	if (Debug)
-	UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::OverTime"));
+	if (GetCharacterMovement()->MaxWalkSpeed <= MaxPlayerSpeedLimit)
+	{
+		GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
+		if (Debug)
+			UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::OverTime"));
+	}
+
 }
 //ChangeSpeed OverScores
 void ARunnerCharacter::OverScores(int32 Scores)
@@ -207,8 +211,12 @@ void ARunnerCharacter::OverScores(int32 Scores)
 	int32 TempScores = AmountOfScoresToRiseUpSpeed - Scores;
 	if (TempScores <= 0)
 	{
-		AmountOfScoresToRiseUpSpeed += Scores;
-		GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
+		if (GetCharacterMovement()->MaxWalkSpeed <= MaxPlayerSpeedLimit)
+		{
+			AmountOfScoresToRiseUpSpeed += Scores;
+			GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
+		}
+
 	}
 	if (Debug)
 	UE_LOG(LogTemp, Warning, TEXT("CurrentAmountOfScores = %d"), AmountOfScoresToRiseUpSpeed);
@@ -219,10 +227,14 @@ void ARunnerCharacter::OverProgress()
 	FVector VectorDifference = GetCharacterMovement()->GetLastUpdateLocation() - CoordToRiseSpeed;
 	if (VectorDifference.Size() >= DistanceToRiseUpSpeed)
 	{
-		CoordToRiseSpeed = GetCharacterMovement()->GetLastUpdateLocation();
-		GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
-		if(Debug)
-		UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::OverProgress %f"), CoordToRiseSpeed.Size());
+		if (GetCharacterMovement()->MaxWalkSpeed <= MaxPlayerSpeedLimit)
+		{
+			CoordToRiseSpeed = GetCharacterMovement()->GetLastUpdateLocation();
+			GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
+			if (Debug)
+				UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::OverProgress %f"), CoordToRiseSpeed.Size());
+		}
+
 	}
 }
 

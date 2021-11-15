@@ -97,6 +97,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
 		float TimeUntillSpeedUp = 0.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
+		float MaxPlayerSpeedLimit = 0.0f;
+
 	//SwitchLaneVariables
 	//Current lane
 	int32 Lane = 1;	
