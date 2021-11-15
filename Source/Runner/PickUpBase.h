@@ -30,6 +30,7 @@ public:
 	UFUNCTION()
 	void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	//PickUp object Name 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickUpSettings")
 		FString ObjectName;
 };

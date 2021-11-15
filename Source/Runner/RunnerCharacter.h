@@ -78,26 +78,23 @@ public:
 	void OverProgress();
 	
 	//Basic Y-Coord of lane to switch
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
 		TArray<float> LaneY;
-	//CharacterOffcetStrengthWhileSwitchingLanes
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
-		FVector Offcet;
-	//Timer Value to do offcet
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
+	//CharacterOffcetStrengthWhileSwitchingLanes	
+		FVector Offcet = FVector(0.0f, 5.0f, 0.0f);
+	//Timer Value to do offcet	
 		float Timer = 0.001f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
 		ESpeedChangeTypes SpeedChangeTypes = ESpeedChangeTypes::FirstType;
 	
 	//Amount of boost your speed get after each iteration
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "1200", UIMin = "0", UIMax = "1200"), Category = "RunnerCFG")
 		float SpeedRiseValue = 0.0f;
 
 	//Need to adjust how often you get speed rise with "Increase Speed OverTime" Mode On
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
 		float TimeUntillSpeedUp = 0.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "1200", UIMin = "0", UIMax = "1200"), Category = "RunnerCFG")
 		float MaxPlayerSpeedLimit = 0.0f;
 
 	//SwitchLaneVariables

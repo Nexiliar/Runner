@@ -44,11 +44,11 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+	//Obstacles classess to randomly spawn on tile
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
 		TArray<TSubclassOf<class AObstacleBase>> Obstacles;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
+	//Tile lifetime, need to controll tile destruction
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "1000", UIMin = "0", UIMax = "1000"),Category = "Config")
 		float LifeTime = 0.0f;
 
 	UFUNCTION()
@@ -62,10 +62,11 @@ public:
 	TArray<bool> OccupiedLanes;
 	
 	
-
+	//PickUp Classess to randomly spawn on tile
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
 		TArray<TSubclassOf<class APickUpBase>> PickUps;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
+	//SpawnChance for obstacles
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "100", UIMin = "0", UIMax = "100"), Category = "MapPartSpawningSettings")
 		int32 PercentSpawnChance = 0;
 
 	 
