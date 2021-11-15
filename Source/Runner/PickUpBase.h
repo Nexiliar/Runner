@@ -33,4 +33,10 @@ public:
 	//PickUp object Name 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickUpSettings")
 		FString ObjectName;
+	//Sound to play when pick up
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickUpSettings")
+		USoundBase* PickUpSound = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "20000", UIMin = "0", UIMax = "20000"),Category = "PickUpSettings")
+		int32 AmountOfScoresGainOnPickUp = 0;
 };

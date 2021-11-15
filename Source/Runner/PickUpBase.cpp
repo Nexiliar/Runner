@@ -37,7 +37,8 @@ void APickUpBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 	ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (Gamemode)
 	{
-		Gamemode->ChangeScores(100);
+		Gamemode->ChangeScores(AmountOfScoresGainOnPickUp);		
+		UGameplayStatics::PlaySound2D(GetWorld(), PickUpSound);
 		this->Destroy();
 	}	
 }
