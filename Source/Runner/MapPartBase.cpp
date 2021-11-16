@@ -43,7 +43,7 @@ void AMapPartBase::BeginPlay()
 	}	
 	Spawn();
 	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AMapPartBase::CollisionBoxBeginOverlap);
-	SetLifeSpan(LifeTime);
+	
 }
 
 // Called every frame
@@ -60,7 +60,10 @@ void AMapPartBase::CollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedCompo
 	{
 		Gamemode->ChangeScores(10);
 	}
+	GetWorld()->GetTimerManager().SetTimer(DestoyTimerHandle, this, &AMapPartBase::DestroyTile, 3.0f, false);
 }
+	
+
 
 void AMapPartBase::Spawn()
 {	
@@ -100,7 +103,7 @@ void AMapPartBase::SpawnPickUp()
 			APickUpBase* Coin = Cast<APickUpBase>(GetWorld()->SpawnActor(PickUps[RandPickUpType], &Loc));
 			if (Coin)
 			{
-				Coin->SetLifeSpan(LifeTime);
+				Children.Add(Coin);				
 			}
 		}
 	}	
@@ -110,8 +113,7 @@ void AMapPartBase::SpawnObstacle(bool TwoObjects)
 {
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	SpawnParams.Owner = this;
-	SpawnParams.Instigator = GetInstigator();
+	SpawnParams.Owner = this;	
 	FRotator Rot = GetActorRotation();
 
 	int8 RandObstacleType = FMath::RandRange(0, Obstacles.Num()-1);
@@ -121,8 +123,7 @@ void AMapPartBase::SpawnObstacle(bool TwoObjects)
 		AObstacleBase* Obstacle = Cast<AObstacleBase>(GetWorld()->SpawnActor(Obstacles[RandObstacleType], &SpawnLocation, &Rot, SpawnParams));
 		if (Obstacle)
 		{
-			Obstacle->SetLifeSpan(LifeTime);
-
+			Children.Add(Obstacle);			
 		}
 		if (TwoObjects)
 		{
@@ -175,4 +176,15 @@ FVector AMapPartBase::SpawnRules()
 	//UE_LOG(LogTemp, Warning, TEXT("Location %s"), *LocactionForSpawn.ToString());
 	return LocactionForSpawn;
 }
+
+void AMapPartBase::DestroyTile()
+{	
+	this->GetAllChildActors(Children);
+	for (int8 i = 0; i < Children.Num(); i++)
+	{		
+			Children[i]->Destroy();				
+	}
+	this->Destroy();	
+}
+	
 

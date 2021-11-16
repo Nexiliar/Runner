@@ -47,9 +47,7 @@ public:
 	//Obstacles classess to randomly spawn on tile
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
 		TArray<TSubclassOf<class AObstacleBase>> Obstacles;
-	//Tile lifetime, need to controll tile destruction
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "1000", UIMin = "0", UIMax = "1000"),Category = "Config")
-		float LifeTime = 0.0f;
+	FTimerHandle DestoyTimerHandle;
 
 	UFUNCTION()
 		virtual	void  CollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -60,7 +58,7 @@ public:
 	
 	FVector SpawnRules();
 	TArray<bool> OccupiedLanes;
-	
+	TArray<AActor*> Children;
 	FVector LocactionForSpawn;
 	//PickUp Classess to randomly spawn on tile
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
@@ -69,5 +67,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "100", UIMin = "0", UIMax = "100"), Category = "MapPartSpawningSettings")
 		int32 PercentSpawnChance = 0;
 
+	void DestroyTile();
 	 
 };

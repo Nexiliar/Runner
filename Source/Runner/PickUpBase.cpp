@@ -39,7 +39,7 @@ void APickUpBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 	{
 		Gamemode->ChangeScores(AmountOfScoresGainOnPickUp);		
 		UGameplayStatics::PlaySound2D(GetWorld(), PickUpSound);
-		this->Destroy();
+		PickUpMesh->SetVisibility(false);		
 	}	
 }
 
