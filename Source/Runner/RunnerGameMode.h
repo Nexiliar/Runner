@@ -24,7 +24,7 @@ protected:
 
 	int32 CurrentPoints;
 
-	AMapPawn* mMap;
+	AMapPawn* GameMap;
 
 public:
 	

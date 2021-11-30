@@ -28,7 +28,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
 		class UStaticMeshComponent* FloorMesh = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
-		class UArrowComponent* ArrowComp = nullptr;
+		class UArrowComponent* ArrowEndLocComp = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
+		class UArrowComponent* TileLocation = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
 		class UBoxComponent* BoxComponent = nullptr;
 
@@ -46,6 +48,9 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+		void UpdateLocation(FVector Offset);
 
 	FTimerHandle DestoyTimerHandle;
 	UFUNCTION()

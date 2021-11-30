@@ -12,19 +12,12 @@ void ARunnerGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	////Spawning road when game starts
-	//for (int i = 0; i < StartMapLength; i++)
-	//{
-	//	SpawnMapPart();
-	//}
-
+	// Create and spawm map pawn
 	FVector NewLocation = FVector(-500, 0, 0);
 	FTransform NewTransform(NewLocation);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	mMap = Cast<AMapPawn>(GetWorld()->SpawnActor(MapClass, &NewTransform, SpawnParams));
-
-
+	GameMap = Cast<AMapPawn>(GetWorld()->SpawnActor(MapClass, &NewTransform, SpawnParams));
 
 }
 
@@ -34,30 +27,7 @@ void ARunnerGameMode::SpawnEvent(AMapPartBase* Tile)
 
 void ARunnerGameMode::SpawnMapPart()
 {
-	FActorSpawnParameters SpawnParams;
-
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	int8 TileForSpawn = FMath::RandRange(0, 100);
-	if (TileForSpawn <= 10)
-	{
-		AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(MapParts[1], &SpawnPoint, SpawnParams));
-		if (NewPart)
-		{
-			FVector Location = NewPart->ArrowComp->GetComponentLocation();
-			SpawnPoint.SetLocation(Location);
-			SpawnEvent(NewPart);
-		}
-	}
-	else
-	{
-		AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(MapParts[0], &SpawnPoint, SpawnParams));
-		if (NewPart)
-		{
-			FVector Location = NewPart->ArrowComp->GetComponentLocation();
-			SpawnPoint.SetLocation(Location);
-			Spawn(NewPart);
-		}
-	}
+	GameMap->CreateNewTile();
 }
 
 void ARunnerGameMode::ChangeScores(int32 Amount)
