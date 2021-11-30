@@ -34,14 +34,15 @@ AMapPartBase::AMapPartBase()
 
 // Called when the game starts or when spawned
 void AMapPartBase::BeginPlay()
-{
-	OccupiedLanes.SetNum(3);
+{	
 	Super::BeginPlay();
+	OccupiedLanes.SetNum(3);
+	
 	for (int8 i = 0; i < OccupiedLanes.Num() - 1; i++)
 	{
 		OccupiedLanes[i] = false;
-	}	
-	Spawn();
+	}
+	//Spawn();
 	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AMapPartBase::CollisionBoxBeginOverlap);
 	
 }
@@ -54,84 +55,16 @@ void AMapPartBase::Tick(float DeltaTime)
 }
 
 void AMapPartBase::CollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
+{	
 	ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (Gamemode)
 	{
 		Gamemode->ChangeScores(10);
+		Gamemode->SpawnMapPart();		
 	}
 	GetWorld()->GetTimerManager().SetTimer(DestoyTimerHandle, this, &AMapPartBase::DestroyTile, 3.0f, false);
 }
-	
 
-
-void AMapPartBase::Spawn()
-{	
-	int8 SpawnChance = FMath::RandRange(0, 100);
-	
-	if (SpawnChance <= PercentSpawnChance)
-	{			
-		int8 Lanestooccupy = FMath::RandRange(0, 100);
-		if (Lanestooccupy <= 50)
-		{			
-			SpawnObstacle(false);
-		}
-		else
-		{			
-			SpawnObstacle(true);			
-		}			
-	}	
-	if(SpawnChance<= 90)
-	SpawnPickUp();
-	
-}
-
-void AMapPartBase::SpawnPickUp()
-{
-	int8 RandPickUpType = FMath::RandRange(0, PickUps.Num() - 1);
-	
-	if (PickUps[RandPickUpType].GetDefaultObject()->ObjectName == "Coin")
-	{
-		int8 Random = FMath::RandRange(1, 9);
-
-		FVector Offcet(400.0f, 0.0f, 0.0f);
-		FVector Loc = SpawnRules() - Offcet;
-		FVector StepBetweenCoins(80.0f, 0.0f, 0.0f);
-		for (int8 i = 0; i < Random; i++)
-		{
-			Loc += StepBetweenCoins;
-			APickUpBase* Coin = Cast<APickUpBase>(GetWorld()->SpawnActor(PickUps[RandPickUpType], &Loc));
-			if (Coin)
-			{
-				Children.Add(Coin);				
-			}
-		}
-	}	
-}
-
-void AMapPartBase::SpawnObstacle(bool TwoObjects)
-{
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	SpawnParams.Owner = this;	
-	FRotator Rot = GetActorRotation();
-
-	int8 RandObstacleType = FMath::RandRange(0, Obstacles.Num()-1);
-	FVector SpawnLocation = SpawnRules();
-	
-
-		AObstacleBase* Obstacle = Cast<AObstacleBase>(GetWorld()->SpawnActor(Obstacles[RandObstacleType], &SpawnLocation, &Rot, SpawnParams));
-		if (Obstacle)
-		{
-			Children.Add(Obstacle);			
-		}
-		if (TwoObjects)
-		{
-			SpawnObstacle(false);
-		}
-
-
-}
 
 FVector AMapPartBase::SpawnRules()
 {	
@@ -172,7 +105,6 @@ FVector AMapPartBase::SpawnRules()
 			LocactionForSpawn = SpawnRules();
 		}
 	}
-
 	//UE_LOG(LogTemp, Warning, TEXT("Location %s"), *LocactionForSpawn.ToString());
 	return LocactionForSpawn;
 }

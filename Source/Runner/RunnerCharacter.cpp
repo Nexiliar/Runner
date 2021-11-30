@@ -119,7 +119,8 @@ void ARunnerCharacter::SwitchRoadLeft()
 	isRight = false;
 	if (Lane != 0 && !CanSwitchLane(isRight))
 	{
-		Lane = Lane - 1;		
+		Lane = Lane - 1;	
+		
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle_SwitchSide, this, &ARunnerCharacter::OffsetCharacterToLane, Timer, true);
 	}
 }
@@ -130,6 +131,7 @@ void ARunnerCharacter::SwitchRoadRight()
 	if (Lane != 2 && !CanSwitchLane(isRight))
 	{
 			Lane = Lane + 1;
+			
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle_SwitchSide, this, &ARunnerCharacter::OffsetCharacterToLane, Timer, true);	
 	}
 }
@@ -141,12 +143,12 @@ void ARunnerCharacter::OffsetCharacterToLane()
 	if (GetActorLocation() != GoTo)
 	{
 		if (isRight)
-		{
-				AddActorWorldOffset(Offcet);			
+		{			
+			AddActorWorldOffset(Offcet);			
 		}
 		else
-		{
-				AddActorWorldOffset(Offcet * -1);
+		{			
+			AddActorWorldOffset(Offcet * -1);
 		}		
 	}
 	else
@@ -168,8 +170,7 @@ bool ARunnerCharacter::CanSwitchLane(bool SwitchSide)
 	RightVector = RightVector * 500 + SpawnLocation;
 	Hit = GetWorld()->LineTraceSingleByChannel(HitResult, SpawnLocation, RightVector, ECollisionChannel::ECC_Visibility);	
 	if (!Hit)
-	{
-		
+	{		
 		FVector EndUpLocation(60.0f, 0.0f, 0.0f);
 		SpawnLocation -= EndUpLocation;
 		Hit = GetWorld()->LineTraceSingleByChannel(HitResult, SpawnLocation, RightVector, ECollisionChannel::ECC_Visibility);
@@ -201,26 +202,18 @@ void ARunnerCharacter::ChangeSpeed()
 //ChangeSpeed OverTime
 void ARunnerCharacter::OverTime()
 {
-	if (GetCharacterMovement()->MaxWalkSpeed <= MaxPlayerSpeedLimit)
-	{
 		GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
 		if (Debug)
 			UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::OverTime"));
-	}
-
 }
 //ChangeSpeed OverScores
 void ARunnerCharacter::OverScores(int32 Scores)
 {
 	int32 TempScores = AmountOfScoresToRiseUpSpeed - Scores;
 	if (TempScores <= 0)
-	{
-		if (GetCharacterMovement()->MaxWalkSpeed <= MaxPlayerSpeedLimit)
-		{
+	{	
 			AmountOfScoresToRiseUpSpeed += Scores;
 			GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
-		}
-
 	}
 	if (Debug)
 	UE_LOG(LogTemp, Warning, TEXT("CurrentAmountOfScores = %d"), AmountOfScoresToRiseUpSpeed);
@@ -231,13 +224,12 @@ void ARunnerCharacter::OverProgress()
 	FVector VectorDifference = GetCharacterMovement()->GetLastUpdateLocation() - CoordToRiseSpeed;
 	if (VectorDifference.Size() >= DistanceToRiseUpSpeed)
 	{
-		if (GetCharacterMovement()->MaxWalkSpeed <= MaxPlayerSpeedLimit)
-		{
+		
 			CoordToRiseSpeed = GetCharacterMovement()->GetLastUpdateLocation();
 			GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
 			if (Debug)
 				UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::OverProgress %f"), CoordToRiseSpeed.Size());
-		}
+		
 
 	}
 }

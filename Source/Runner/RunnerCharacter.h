@@ -92,10 +92,7 @@ public:
 
 	//Need to adjust how often you get speed rise with "Increase Speed OverTime" Mode On
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
-		float TimeUntillSpeedUp = 0.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "1200", UIMin = "0", UIMax = "1200"), Category = "RunnerCFG")
-		float MaxPlayerSpeedLimit = 0.0f;
+		float TimeUntillSpeedUp = 0.0f;	
 
 	//SwitchLaneVariables
 	//Current lane

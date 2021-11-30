@@ -18,7 +18,7 @@ class ARunnerGameMode : public AGameModeBase
 public:
 	ARunnerGameMode();
 
-	FTimerHandle TimerHandle_SpawnMapBase;
+	
 	
 
 protected:
@@ -31,15 +31,21 @@ protected:
 public:
 	//MapTileClass to Spawn
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
-		TSubclassOf<class AMapPartBase> MapPart = nullptr;
-	//Spawn tile speed
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.1", ClampMax = "1", UIMin = "0.1", UIMax = "1"), Category = "MapPartSpawningSettings")
-		float MapSpawnSpeed = 0.0f;
+		TArray<TSubclassOf<class AMapPartBase>> MapParts;
 	//Basic start map lenght generated with tiles
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "30", UIMin = "0", UIMax = "30"), Category = "MapPartSpawningSettings")
 		int32 StartMapLength = 0;
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Scores")
 		FOnScoresChange OnScoresChange;
+
+	//PickUp Classess to randomly spawn on tile
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
+		TArray<TSubclassOf<class APickUpBase>> PickUps;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
+		TArray<TSubclassOf<class AObstacleBase>> Obstacles;
+	//SpawnChance for obstacles
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "100", UIMin = "0", UIMax = "100"), Category = "MapPartSpawningSettings")
+		int32 PercentSpawnChance = 0;
 
 	FTransform SpawnPoint;
 
@@ -51,6 +57,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Points")
 		int32 GetCurrentScores();
 	
+	void SpawnEvent(AMapPartBase* Tile);
+
+	void Spawn(AMapPartBase* Tile);
+	void SpawnPickUp(AMapPartBase* MapTile);
+	void SpawnObstacle(bool TwoObjects, AMapPartBase* MapTile);
 };
 
 
