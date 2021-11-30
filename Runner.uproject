@@ -15,11 +15,6 @@
 	],
 	"Plugins": [
 		{
-			"Name": "ElectronicNodes",
-			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/5cb2a394d0c04e73891762be4cbd7216"
-		},
-		{
 			"Name": "RootMotionGuidePlugin",
 			"Enabled": true,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/e3aab86c458c4b4999d6b80249f33a6d"

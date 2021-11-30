@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "MapPartBase.h"
 
 #include "RunnerGameMode.h"
@@ -8,15 +7,15 @@
 // Sets default values
 AMapPartBase::AMapPartBase()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("MainScene"));
 	RootComponent = SceneComp;
 
 	FloorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SM_Floor"));
 	FloorMesh->SetupAttachment(RootComponent);
-	
+
 	ArrowComp = CreateDefaultSubobject<UArrowComponent>(TEXT("AttachPoint"));
 	ArrowComp->SetupAttachment(FloorMesh);
 
@@ -29,46 +28,47 @@ AMapPartBase::AMapPartBase()
 	Mid->SetupAttachment(FloorMesh);
 	Right = CreateDefaultSubobject<UArrowComponent>(TEXT("Right"));
 	Right->SetupAttachment(FloorMesh);
+}
 
+AMapPartBase::~AMapPartBase()
+{
+	//DestroyTile();
 }
 
 // Called when the game starts or when spawned
 void AMapPartBase::BeginPlay()
-{	
+{
 	Super::BeginPlay();
 	OccupiedLanes.SetNum(3);
-	
+
 	for (int8 i = 0; i < OccupiedLanes.Num() - 1; i++)
 	{
 		OccupiedLanes[i] = false;
 	}
 	//Spawn();
-	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AMapPartBase::CollisionBoxBeginOverlap);
-	
+	//BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AMapPartBase::CollisionBoxBeginOverlap);
 }
 
 // Called every frame
 void AMapPartBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AMapPartBase::CollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{	
+{
 	ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (Gamemode)
 	{
 		Gamemode->ChangeScores(10);
-		Gamemode->SpawnMapPart();		
+		Gamemode->SpawnMapPart();
 	}
 	GetWorld()->GetTimerManager().SetTimer(DestoyTimerHandle, this, &AMapPartBase::DestroyTile, 3.0f, false);
 }
 
-
 FVector AMapPartBase::SpawnRules()
-{	
-	int8 RandSpawnLane = FMath::RandRange(1, 3);	
+{
+	int8 RandSpawnLane = FMath::RandRange(1, 3);
 	if (RandSpawnLane == 1)
 	{
 		if (OccupiedLanes[0] == false)
@@ -110,13 +110,11 @@ FVector AMapPartBase::SpawnRules()
 }
 
 void AMapPartBase::DestroyTile()
-{	
+{
 	this->GetAllChildActors(Children);
 	for (int8 i = 0; i < Children.Num(); i++)
-	{		
-			Children[i]->Destroy();				
+	{
+		Children[i]->Destroy();
 	}
-	this->Destroy();	
+	this->Destroy();
 }
-	
-

@@ -6,41 +6,47 @@
 
 ARunnerGameMode::ARunnerGameMode()
 {
-
 }
-
-
 
 void ARunnerGameMode::BeginPlay()
 {
-	Super::BeginPlay();	
-	
-	//Spawning road when game starts
-	for (int i = 0; i < StartMapLength; i++)
-	{
-		SpawnMapPart();
-	}	
+	Super::BeginPlay();
+
+	////Spawning road when game starts
+	//for (int i = 0; i < StartMapLength; i++)
+	//{
+	//	SpawnMapPart();
+	//}
+
+	FVector NewLocation = FVector(-500, 0, 0);
+	FTransform NewTransform(NewLocation);
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	mMap = Cast<AMapPawn>(GetWorld()->SpawnActor(MapClass, &NewTransform, SpawnParams));
+
+
+
 }
 
 void ARunnerGameMode::SpawnEvent(AMapPartBase* Tile)
 {
-
 }
 
 void ARunnerGameMode::SpawnMapPart()
-{	
+{
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;	
+
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	int8 TileForSpawn = FMath::RandRange(0, 100);
 	if (TileForSpawn <= 10)
 	{
 		AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(MapParts[1], &SpawnPoint, SpawnParams));
-		if(NewPart)
-			{
-				FVector Location = NewPart->ArrowComp->GetComponentLocation();
-				SpawnPoint.SetLocation(Location);
-				SpawnEvent(NewPart);
-			}
+		if (NewPart)
+		{
+			FVector Location = NewPart->ArrowComp->GetComponentLocation();
+			SpawnPoint.SetLocation(Location);
+			SpawnEvent(NewPart);
+		}
 	}
 	else
 	{
@@ -52,8 +58,6 @@ void ARunnerGameMode::SpawnMapPart()
 			Spawn(NewPart);
 		}
 	}
-	//for (int8 i = 0; i< MapParts.Num()-1; i++)
-
 }
 
 void ARunnerGameMode::ChangeScores(int32 Amount)
@@ -85,7 +89,6 @@ void ARunnerGameMode::Spawn(AMapPartBase* Tile)
 	}
 	if (SpawnChance <= 90)
 		SpawnPickUp(Tile);
-
 }
 
 void ARunnerGameMode::SpawnPickUp(AMapPartBase* MapTile)
@@ -116,11 +119,10 @@ void ARunnerGameMode::SpawnObstacle(bool TwoObjects, AMapPartBase* MapTile)
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	SpawnParams.Owner = this;
-	FRotator Rot = MapTile->GetActorRotation(); 
+	FRotator Rot = MapTile->GetActorRotation();
 
 	int8 RandObstacleType = FMath::RandRange(0, Obstacles.Num() - 1);
 	FVector SpawnLocation = MapTile->SpawnRules();
-
 
 	AObstacleBase* Obstacle = Cast<AObstacleBase>(GetWorld()->SpawnActor(Obstacles[RandObstacleType], &SpawnLocation, &Rot, SpawnParams));
 	if (Obstacle)

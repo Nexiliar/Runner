@@ -17,10 +17,12 @@ UCLASS()
 class RUNNER_API AMapPartBase : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AMapPartBase();
+	~AMapPartBase();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
 		class USceneComponent* SceneComp = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
@@ -29,7 +31,6 @@ public:
 		class UArrowComponent* ArrowComp = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
 		class UBoxComponent* BoxComponent = nullptr;
-
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
 		class UArrowComponent* Left = nullptr;
@@ -42,21 +43,18 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;	
+	virtual void Tick(float DeltaTime) override;
 
 	FTimerHandle DestoyTimerHandle;
 	UFUNCTION()
 		virtual	void  CollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-		
+
 	FVector SpawnRules();
 	TArray<bool> OccupiedLanes;
 	TArray<AActor*> Children;
 	FVector LocactionForSpawn;
-	
-
 
 	void DestroyTile();
-	 
 };

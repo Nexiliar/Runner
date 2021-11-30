@@ -29,7 +29,7 @@ ARunnerCharacter::ARunnerCharacter()
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
+	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
@@ -37,8 +37,10 @@ ARunnerCharacter::ARunnerCharacter()
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
+	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
+	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
@@ -49,17 +51,14 @@ ARunnerCharacter::ARunnerCharacter()
 	CheckComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ObstaclesCheck"));
 	CheckComponent->SetupAttachment(RootComponent);
 
-
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
+	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character)
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
-	
+
 	//Init array of Lane Coords
 	LaneY.SetNum(3);
 	LaneY[0] = -320.0f;
 	LaneY[1] = 0.0f;
 	LaneY[2] = 320.0f;
-
-	
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -68,25 +67,23 @@ ARunnerCharacter::ARunnerCharacter()
 void ARunnerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// Set up gameplay key bindings
-	check(PlayerInputComponent);	
+	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);	
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("SwitchRoadRight", IE_Pressed, this, &ARunnerCharacter::SwitchRoadRight);
 	PlayerInputComponent->BindAction("SwitchRoadLeft", IE_Pressed, this, &ARunnerCharacter::SwitchRoadLeft);
-
-
 }
 
 void ARunnerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	MoveForward(1.0f);	
+	MoveForward(1.0f);
 }
 
 void ARunnerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	CoordToRiseSpeed = GetActorLocation();
 	ChangeSpeed();
 	if (isOverScores)
@@ -96,7 +93,7 @@ void ARunnerCharacter::BeginPlay()
 		{
 			Gamemode->OnScoresChange.AddDynamic(this, &ARunnerCharacter::OverScores);
 		}
-	}	
+	}
 }
 
 void ARunnerCharacter::MoveForward(float Value)
@@ -113,64 +110,66 @@ void ARunnerCharacter::MoveForward(float Value)
 	}
 }
 
-
 void ARunnerCharacter::SwitchRoadLeft()
 {
-	isRight = false;
-	if (Lane != 0 && !CanSwitchLane(isRight))
-	{
-		Lane = Lane - 1;	
-		
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_SwitchSide, this, &ARunnerCharacter::OffsetCharacterToLane, Timer, true);
-	}
+	//isRight = false;
+	//if (Lane != 0 && !CanSwitchLane(isRight))
+	//{
+	//	Lane = Lane - 1;
+	//
+	//GetWorld()->GetTimerManager().SetTimer(TimerHandle_SwitchSide, this, &ARunnerCharacter::OffsetCharacterToLane, Timer, true);
+	//}
+	SetActorLocation(GetActorLocation() + FVector(0.0f, -300.0f, 0.0f));
 }
 
 void ARunnerCharacter::SwitchRoadRight()
 {
-	isRight = true;
+	/*isRight = true;
 	if (Lane != 2 && !CanSwitchLane(isRight))
 	{
-			Lane = Lane + 1;
-			
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle_SwitchSide, this, &ARunnerCharacter::OffsetCharacterToLane, Timer, true);	
-	}
+		Lane = Lane + 1;
+
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_SwitchSide, this, &ARunnerCharacter::OffsetCharacterToLane, Timer, true);
+	}*/
+	SetActorLocation(GetActorLocation() + FVector(0.0f, 300.0f, 0.0f));
 }
 
 void ARunnerCharacter::OffsetCharacterToLane()
 {
 	FVector GoTo(GetActorLocation().X, LaneY[Lane], GetActorLocation().Z);
-		
+
 	if (GetActorLocation() != GoTo)
 	{
 		if (isRight)
-		{			
-			AddActorWorldOffset(Offcet);			
+		{
+			AddActorWorldOffset(Offcet);
 		}
 		else
-		{			
+		{
 			AddActorWorldOffset(Offcet * -1);
-		}		
+		}
 	}
 	else
 	{
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle_SwitchSide);
 	}
 }
+
 //Trace to checkout is there is an obstacle
 bool ARunnerCharacter::CanSwitchLane(bool SwitchSide)
 {
 	bool Hit;
 	FVector SpawnLocation = CheckComponent->GetComponentLocation();
 	FHitResult HitResult;
-	FVector RightVector = CheckComponent->GetRightVector();	
+	FVector RightVector = CheckComponent->GetRightVector();
 	if (!SwitchSide)
 	{
 		RightVector = RightVector * (-1.0f);
-	}		
+	}
 	RightVector = RightVector * 500 + SpawnLocation;
-	Hit = GetWorld()->LineTraceSingleByChannel(HitResult, SpawnLocation, RightVector, ECollisionChannel::ECC_Visibility);	
+	Hit = GetWorld()->LineTraceSingleByChannel(HitResult, SpawnLocation, RightVector, ECollisionChannel::ECC_Visibility);
 	if (!Hit)
-	{		
+	{
 		FVector EndUpLocation(60.0f, 0.0f, 0.0f);
 		SpawnLocation -= EndUpLocation;
 		Hit = GetWorld()->LineTraceSingleByChannel(HitResult, SpawnLocation, RightVector, ECollisionChannel::ECC_Visibility);
@@ -178,10 +177,11 @@ bool ARunnerCharacter::CanSwitchLane(bool SwitchSide)
 			DrawDebugLine(GetWorld(), SpawnLocation, RightVector, FColor::Green, false, 50.0f);
 	}
 	if (Debug)
-		DrawDebugLine(GetWorld(), SpawnLocation, RightVector, FColor::Blue,false,50.0f);
+		DrawDebugLine(GetWorld(), SpawnLocation, RightVector, FColor::Blue, false, 50.0f);
 	return Hit;
 }
-//Simple ChangeSpeedFunc 
+
+//Simple ChangeSpeedFunc
 void ARunnerCharacter::ChangeSpeed()
 {
 	switch (SpeedChangeTypes)
@@ -199,38 +199,38 @@ void ARunnerCharacter::ChangeSpeed()
 		break;
 	}
 }
+
 //ChangeSpeed OverTime
 void ARunnerCharacter::OverTime()
 {
-		GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
-		if (Debug)
-			UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::OverTime"));
+	GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
+	if (Debug)
+		UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::OverTime"));
 }
+
 //ChangeSpeed OverScores
 void ARunnerCharacter::OverScores(int32 Scores)
 {
 	int32 TempScores = AmountOfScoresToRiseUpSpeed - Scores;
 	if (TempScores <= 0)
-	{	
-			AmountOfScoresToRiseUpSpeed += Scores;
-			GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
+	{
+		AmountOfScoresToRiseUpSpeed += Scores;
+		GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
 	}
 	if (Debug)
-	UE_LOG(LogTemp, Warning, TEXT("CurrentAmountOfScores = %d"), AmountOfScoresToRiseUpSpeed);
+		UE_LOG(LogTemp, Warning, TEXT("CurrentAmountOfScores = %d"), AmountOfScoresToRiseUpSpeed);
 }
+
 //ChangeSpeed OverMapProgress
 void ARunnerCharacter::OverProgress()
-{	
+{
 	FVector VectorDifference = GetCharacterMovement()->GetLastUpdateLocation() - CoordToRiseSpeed;
 	if (VectorDifference.Size() >= DistanceToRiseUpSpeed)
 	{
-		
-			CoordToRiseSpeed = GetCharacterMovement()->GetLastUpdateLocation();
-			GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
-			if (Debug)
-				UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::OverProgress %f"), CoordToRiseSpeed.Size());
-		
-
+		CoordToRiseSpeed = GetCharacterMovement()->GetLastUpdateLocation();
+		GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
+		if (Debug)
+			UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::OverProgress %f"), CoordToRiseSpeed.Size());
 	}
 }
 
@@ -241,7 +241,7 @@ bool ARunnerCharacter::DeadEvent()
 		GetCharacterMovement()->MaxWalkSpeed -= GetCharacterMovement()->MaxWalkSpeed;
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 		GetMesh()->SetSimulatePhysics(true);
-		
+
 		CharDead_BP();
 	}
 	return true;
@@ -249,6 +249,4 @@ bool ARunnerCharacter::DeadEvent()
 
 void ARunnerCharacter::CharDead_BP_Implementation()
 {
-
 }
-
