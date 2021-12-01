@@ -31,15 +31,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapSettings")
 		TSubclassOf<class AMapPawn> MapClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapSettings")
-		float MapStartSpeed = 300.f;
+		float StartCharSpeed = 300.f;
 
 	//MapTileClass to Spawn
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
-		TArray<TSubclassOf<class AMapPartBase>> MapParts;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
+	//	TArray<TSubclassOf<class AMapPartBase>> MapParts;
 
 	//Basic start map lenght generated with tiles
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "30", UIMin = "0", UIMax = "30"), Category = "MapPartSpawningSettings")
-		int32 StartMapLength = 0;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "30", UIMin = "0", UIMax = "30"), Category = "MapPartSpawningSettings")
+	//	int32 StartMapLength = 0;
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Scores")
 		FOnScoresChange OnScoresChange;
 

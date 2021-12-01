@@ -1,12 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "MapPawn.h"
 
 // Sets default values
 AMapPawn::AMapPawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
 
@@ -25,16 +24,12 @@ void AMapPawn::BeginPlay()
 void AMapPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (MapIsMovable)
-		MovementTick(DeltaTime);
 }
 
 void AMapPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
-
 
 void AMapPawn::AddTileToMap(AMapPartBase* Tile)
 {
@@ -47,12 +42,11 @@ void AMapPawn::AddTileToMap(AMapPartBase* Tile)
 			Head->Tile = Tile;
 			Head->Prev = Head;
 			Head->Next = Head;
-
 		}
 		else
 		{
 			Node* NewNode = new Node();
-			
+
 			// create new Node
 			NewNode->Tile = Tile;
 			NewNode->Prev = Head->Prev;
@@ -65,27 +59,16 @@ void AMapPawn::AddTileToMap(AMapPartBase* Tile)
 	}
 }
 
-void AMapPawn::MovementTick(float DeltaTime)
-{
-	float Speed = 300.f;
-	FVector Direction(1.0f, 0.0f, 0.0f);
-	FVector Offset = -1 * Direction * Speed * DeltaTime;
-	OnMapMoved.Broadcast(Offset);
-	//FVector CurrentLocation = Head->Tile->TileLocation->GetComponentTransform().GetLocation();
-	//Node* CurNode = Head;
-	//while (CurNode->Next != Head)
-	//{
-	//	CurNode->Tile->AddActorWorldOffset(Offset);
-	//	CurNode = CurNode->Next;
-	//}
-	//CurNode->Tile->AddActorWorldOffset(Offset);
-	//CurNode = nullptr;
-}
-
 void AMapPawn::CreateNewTile()
 {
+	// delete last before spawn new
+	if (CurrentMapLength >= MapMaxTileNum)
+	{
+		DeleteLastTile();
+	}
+
 	FVector NewLocation = FVector(0.0f, 0.0f, 0.0f);
-	if (!Head) 
+	if (!Head)
 		NewLocation = GetActorLocation();
 	else
 	{
@@ -97,17 +80,10 @@ void AMapPawn::CreateNewTile()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	SpawnParams.Owner = this;
 
-	if (CurrentMapLength > MapMaxTileNum)
-	{
-		DeleteLastTile();	
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("AMapPawn::CreateNewTile ArrowLoc -  %i"), CurrentMapLength);
-
 	CurrentMapLength++;
-	
+	//UE_LOG(LogTemp, Warning, TEXT("AMapPawn::CreateNewTile ArrowLoc -  %s, TileNum - %i"), *NewLocation.ToString(), CurrentMapLength);
+
 	AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(MapElementsTypes[0], &NewTransform, SpawnParams));
-	this->OnMapMoved.AddDynamic(NewPart, &AMapPartBase::UpdateLocation);
 	AddTileToMap(NewPart);
 }
 
@@ -138,18 +114,18 @@ void AMapPawn::CreateNewTile()
 //	}
 //}
 
-
 void AMapPawn::DeleteLastTile()
 {
 	if (Head->Prev != Head)
 	{
-		Node* Tail = Head->Prev;
-		Head->Prev = Tail->Prev;
-		Tail->Next = Head;
+		Node* NewHead = Head->Next;
+		NewHead->Prev = Head->Prev;
+		Head->Prev->Next = NewHead;
+
+		Head->Tile->DestroyTile();
+		Head = NewHead;
 
 		CurrentMapLength--;
-
-		delete Tail;
 	}
+	//UE_LOG(LogTemp, Warning, TEXT("AMapPawn::DeleteLastTile: TileNum - %i"), CurrentMapLength);
 }
-

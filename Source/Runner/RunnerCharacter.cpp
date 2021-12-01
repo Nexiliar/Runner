@@ -50,15 +50,6 @@ ARunnerCharacter::ARunnerCharacter()
 	//Create arrow comp for obstacle check coord
 	CheckComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ObstaclesCheck"));
 	CheckComponent->SetupAttachment(RootComponent);
-
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character)
-	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
-
-	//Init array of Lane Coords
-	LaneY.SetNum(3);
-	LaneY[0] = -320.0f;
-	LaneY[1] = 0.0f;
-	LaneY[2] = 320.0f;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -77,6 +68,7 @@ void ARunnerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 void ARunnerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
 	MoveForward(1.0f);
 }
 
@@ -112,47 +104,72 @@ void ARunnerCharacter::MoveForward(float Value)
 
 void ARunnerCharacter::SwitchRoadLeft()
 {
-	//isRight = false;
-	//if (Lane != 0 && !CanSwitchLane(isRight))
-	//{
-	//	Lane = Lane - 1;
-	//
-	//GetWorld()->GetTimerManager().SetTimer(TimerHandle_SwitchSide, this, &ARunnerCharacter::OffsetCharacterToLane, Timer, true);
-	//}
-	SetActorLocation(GetActorLocation() + FVector(0.0f, -300.0f, 0.0f));
+	if (CurrentLine != EMovementLine::LINE_1 && !bShifting) 
+	{		
+		bShiftLeft = true;
+		CurrentLine = (CurrentLine == EMovementLine::LINE_3) ? EMovementLine::LINE_2 : EMovementLine::LINE_1;
+		ShiftDestinationPos = GetActorLocation() + FVector(0.0f, -LineOffset, 0.0f);
+		//UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::SwitchRoadLeft:  Location - %s, Destination - %s"), *GetActorLocation().ToString(), *ShiftDestinationPos.ToString());
+		StartShiftingLine();
+	}
 }
 
 void ARunnerCharacter::SwitchRoadRight()
 {
-	/*isRight = true;
-	if (Lane != 2 && !CanSwitchLane(isRight))
+	if (CurrentLine != EMovementLine::LINE_3 && !bShifting)
 	{
-		Lane = Lane + 1;
+		bShiftLeft = false;
+		CurrentLine = (CurrentLine == EMovementLine::LINE_1) ? EMovementLine::LINE_2 : EMovementLine::LINE_3;
+		ShiftDestinationPos = GetActorLocation() + FVector(0.0f, LineOffset, 0.0f);
+		//UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::SwitchRoadRight:  Location - %s, Destination - %s"), *GetActorLocation().ToString(), *ShiftDestinationPos.ToString());
+		StartShiftingLine();
+	}
+}
 
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_SwitchSide, this, &ARunnerCharacter::OffsetCharacterToLane, Timer, true);
-	}*/
-	SetActorLocation(GetActorLocation() + FVector(0.0f, 300.0f, 0.0f));
+void ARunnerCharacter::StartShiftingLine()
+{
+	// block input
+	bShifting = true;
+
+	// play montage
+	if (ShiftMontage)
+	{
+		ShiftMontagePlayTime = ShiftMontage->GetPlayLength();
+		PlayAnimMontage(ShiftMontage, ShiftMontagePlaySpeed);
+	}
+
+	// start timer
+	TimeToShift = ShiftMontagePlayTime / ShiftMontagePlaySpeed;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_SwitchLine, this, &ARunnerCharacter::OffsetCharacterToLane, ShiftOffsetTimeRate, true);
 }
 
 void ARunnerCharacter::OffsetCharacterToLane()
 {
-	FVector GoTo(GetActorLocation().X, LaneY[Lane], GetActorLocation().Z);
-
-	if (GetActorLocation() != GoTo)
+	if (TimeToShift <= 0.0f)
 	{
-		if (isRight)
-		{
-			AddActorWorldOffset(Offcet);
-		}
-		else
-		{
-			AddActorWorldOffset(Offcet * -1);
-		}
+		// ClearTimer
+		GetWorld()->GetTimerManager().ClearTimer(TimerHandle_SwitchLine);
+		
+		// Correct Position
+		if (ShiftMontage)
+			GetCapsuleComponent()->AddWorldOffset(FVector(0.0f, ShiftDestinationPos.Y - GetActorLocation().Y, 0.0f));
+		
+		// unblock input
+		bShifting = false;
 	}
 	else
 	{
-		GetWorld()->GetTimerManager().ClearTimer(TimerHandle_SwitchSide);
-	}
+		TimeToShift -= ShiftOffsetTimeRate;
+
+		float AxisX_Offset = GetCharacterMovement()->GetMaxSpeed() * ShiftOffsetTimeRate;
+		float AxisY_Offset = (ShiftOffsetTimeRate * LineOffset) / (ShiftMontagePlayTime / ShiftMontagePlaySpeed);
+
+		if (bShiftLeft)
+			AxisY_Offset *= -1;
+
+		FVector Offset(AxisX_Offset, AxisY_Offset, 0.0f);
+		AddActorWorldOffset(Offset);
+	}	
 }
 
 //Trace to checkout is there is an obstacle
@@ -238,7 +255,7 @@ bool ARunnerCharacter::DeadEvent()
 {
 	if (GetMesh())
 	{
-		GetCharacterMovement()->MaxWalkSpeed -= GetCharacterMovement()->MaxWalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = 0.0f;
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 		GetMesh()->SetSimulatePhysics(true);
 

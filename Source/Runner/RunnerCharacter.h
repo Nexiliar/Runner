@@ -14,18 +14,27 @@ enum class ESpeedChangeTypes : uint8
 	ThirdType UMETA(DisplayName = "Increase Speed Over Certain Map Progress")
 };
 
+UENUM(BlueprintType)
+enum class EMovementLine : uint8
+{
+	LINE_1,
+	LINE_2,
+	LINE_3
+};
+
 UCLASS(config = Game)
 class ARunnerCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-		/** Camera boom positioning the camera behind the character */
-		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	/** Camera boom positioning the camera behind the character */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class USpringArmComponent* CameraBoom;
 
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* FollowCamera;
+
 public:
 	ARunnerCharacter();
 
@@ -42,17 +51,22 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
+
 protected:
 
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
 
-	FTimerHandle TimerHandle_SwitchSide;
+	FTimerHandle TimerHandle_SwitchLine;
 	FTimerHandle TimerHandle_SpeedRise;
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
+
+protected:
+	void StartShiftingLine();
 
 public:
 	/** Returns CameraBoom subobject **/
@@ -73,14 +87,28 @@ public:
 		void OverScores(int32 Scores);
 	void OverProgress();
 
-	//Basic Y-Coord of lane to switch
-	TArray<float> LaneY;
-	//CharacterOffcetStrengthWhileSwitchingLanes
-	FVector Offcet = FVector(0.0f, 5.0f, 0.0f);
-	//Timer Value to do offcet
-	float Timer = 0.001f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
 		ESpeedChangeTypes SpeedChangeTypes = ESpeedChangeTypes::FirstType;
+
+	/** Line shift */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LineShiftCFG")
+		class UAnimMontage* ShiftMontage = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LineShiftCFG")
+		float ShiftMontagePlaySpeed = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LineShiftCFG")
+		float ShiftOffsetTimeRate = 0.01f;
+	//Check whether its left or right lane
+	bool bShiftLeft = false;
+	//CharacterOffcetStrengthWhileSwitchingLanes
+	FVector ShiftDestinationPos = FVector(0.0f, 0.0f, 0.0f);
+	float LineOffset = 300.f;
+	bool bShifting = false;
+	float TimeToShift = 1.0f;
+	float ShiftMontagePlayTime = 1.0f;
+
+	//SwitchLaneVariables
+	EMovementLine CurrentLine = EMovementLine::LINE_2;
+	EMovementLine DestinationLine = EMovementLine::LINE_2;
 
 	//Amount of boost your speed get after each iteration
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "1200", UIMin = "0", UIMax = "1200"), Category = "RunnerCFG")
@@ -90,11 +118,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
 		float TimeUntillSpeedUp = 0.0f;
 
-	//SwitchLaneVariables
-	//Current lane
-	int32 Lane = 1;
-	//Check whether its left or right lane
-	bool isRight = false;
 	bool isOverScores = false;
 
 	//Distance the character need to overcome before he get a speedboost

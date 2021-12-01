@@ -14,8 +14,6 @@ struct Node
 	struct Node* Prev;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMapMoved, FVector, Offset);
-
 UCLASS()
 class RUNNER_API AMapPawn : public APawn
 {
@@ -25,14 +23,9 @@ public:
 	// Sets default values for this pawn's properties
 	AMapPawn();
 
-	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "MapParams")
-		FOnMapMoved OnMapMoved;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawmTile")
 		TArray<TSubclassOf<AMapPartBase>> MapElementsTypes;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapParams")
-		bool MapIsMovable = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapParams")
 		int32 MapMaxTileNum = 5;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapParams")
@@ -43,7 +36,6 @@ protected:
 	virtual void BeginPlay() override;
 
 	void AddTileToMap(AMapPartBase* Tile);
-	void MovementTick(float DeltaTime);
 
 public:	
 	// Called every frame

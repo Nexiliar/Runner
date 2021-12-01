@@ -33,11 +33,6 @@ AMapPartBase::AMapPartBase()
 	Right->SetupAttachment(FloorMesh);
 }
 
-AMapPartBase::~AMapPartBase()
-{
-	//DestroyTile();
-}
-
 // Called when the game starts or when spawned
 void AMapPartBase::BeginPlay()
 {
@@ -58,21 +53,22 @@ void AMapPartBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AMapPartBase::UpdateLocation(FVector Offset)
-{
-	//UE_LOG(LogTemp, Warning, TEXT("AMapPartBase::UpdateLocation -  %s"), *Offset.ToString());
-	AddActorWorldOffset(Offset);
-}
-
 void AMapPartBase::CollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (Gamemode)
+	if (bCollidePersonOnce)
 	{
-		Gamemode->ChangeScores(10);
-		Gamemode->SpawnMapPart();
+		ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		if (Gamemode)
+		{
+			Gamemode->ChangeScores(10);
+			Gamemode->SpawnMapPart();
+		}
+		//UE_LOG(LogTemp, Warning, TEXT("AMapPartBase::CollisionBoxBeginOverlap -  %s"), *this->GetName());
+
+		// prevent multiple overlap
+		bCollidePersonOnce = false;
 	}
-	GetWorld()->GetTimerManager().SetTimer(DestoyTimerHandle, this, &AMapPartBase::DestroyTile, 3.0f, false);
+	
 }
 
 FVector AMapPartBase::SpawnRules()

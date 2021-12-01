@@ -21,7 +21,6 @@ class RUNNER_API AMapPartBase : public AActor
 public:
 	// Sets default values for this actor's properties
 	AMapPartBase();
-	~AMapPartBase();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
 		class USceneComponent* SceneComp = nullptr;
@@ -45,16 +44,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	bool bCollidePersonOnce = true;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-		void UpdateLocation(FVector Offset);
-
-	FTimerHandle DestoyTimerHandle;
-	UFUNCTION()
-		virtual	void  CollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		virtual	void CollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	FVector SpawnRules();
 	TArray<bool> OccupiedLanes;
