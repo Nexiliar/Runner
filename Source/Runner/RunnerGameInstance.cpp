@@ -18,7 +18,6 @@ bool URunnerGameInstance::GetTiles(TArray<FTileInfo>& OutTiles)
 				OutTiles.Add(*TileItem);
 				UE_LOG(LogTemp, Warning, TEXT("URunnerGameInstance::GetTiles: [INfo] Tile - %s"), *TileItem->TileName.ToString());
 			}
-
 			++i;
 		}
 	}

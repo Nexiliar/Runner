@@ -30,7 +30,8 @@ void AMapPawn::BeginPlay()
 	}
 
 	// create tiles at start
-	for (int8 i = 0; i < MapStartTileNum; ++i) {
+	for (int8 i = 0; i < MapStartTileNum; ++i) 
+	{
 		CreateNewTile(true);
 	}
 }
