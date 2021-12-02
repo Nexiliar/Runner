@@ -22,6 +22,7 @@ public:
 	// Sets default values for this actor's properties
 	AMapPartBase();
 
+	// Editable in BP
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
 		class USceneComponent* SceneComp = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
@@ -54,9 +55,11 @@ public:
 		virtual	void CollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	FVector SpawnRules();
+	void DestroyTile();
+
+public:
+
 	TArray<bool> OccupiedLanes;
 	TArray<AActor*> Children;
 	FVector LocactionForSpawn;
-
-	void DestroyTile();
 };

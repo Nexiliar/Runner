@@ -78,9 +78,11 @@ void AMapPawn::CreateNewTile()
 
 	// spawn
 	AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(MapElementsTypes[0], &NewTransform, SpawnParams));
-	AddTileToMap(NewPart);
-
-	CurrentMapLength++;
+	if (NewPart)
+	{
+		AddTileToMap(NewPart);
+		CurrentMapLength++;
+	}
 }
 
 // TODO

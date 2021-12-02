@@ -140,7 +140,7 @@ void ARunnerCharacter::StartShiftingLine()
 
 	// start timer
 	TimeToShift = ShiftMontagePlayTime / ShiftMontagePlaySpeed;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_SwitchLine, this, &ARunnerCharacter::OffsetCharacterToLane, ShiftOffsetTimeRate, true);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_SwitchLine, this, &ARunnerCharacter::OffsetCharacterToLane, ShiftOffsetAnimTimeRate, true);
 }
 
 void ARunnerCharacter::OffsetCharacterToLane()
@@ -159,10 +159,10 @@ void ARunnerCharacter::OffsetCharacterToLane()
 	}
 	else
 	{
-		TimeToShift -= ShiftOffsetTimeRate;
+		TimeToShift -= ShiftOffsetAnimTimeRate;
 
-		float AxisX_Offset = GetCharacterMovement()->GetMaxSpeed() * ShiftOffsetTimeRate;
-		float AxisY_Offset = (ShiftOffsetTimeRate * LineOffset) / (ShiftMontagePlayTime / ShiftMontagePlaySpeed);
+		float AxisX_Offset = GetCharacterMovement()->GetMaxSpeed() * ShiftOffsetAnimTimeRate;
+		float AxisY_Offset = (ShiftOffsetAnimTimeRate * LineOffset) / (ShiftMontagePlayTime / ShiftMontagePlaySpeed);
 
 		if (bShiftLeft)
 			AxisY_Offset *= -1;

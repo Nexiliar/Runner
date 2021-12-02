@@ -49,6 +49,36 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
 		class UArrowComponent* CheckComponent = nullptr;
 
+	/** Editable In BP */
+
+	//Show off debug info
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
+		bool Debug = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
+		ESpeedChangeTypes SpeedChangeTypes = ESpeedChangeTypes::FirstType;
+	//Distance the character need to overcome before he get a speedboost
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
+		float DistanceToRiseUpSpeed = 0.0f;
+	//Amount of boost your speed get after each iteration
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "1200", UIMin = "0", UIMax = "1200"), Category = "RunnerCFG")
+		float SpeedRiseValue = 0.0f;
+	//Need to adjust how often you get speed rise with "Increase Speed OverTime" Mode On
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
+		float TimeUntillSpeedUp = 0.0f;
+	//Scores count the character need to collect before he get a speedboost
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
+		int32 AmountOfScoresToRiseUpSpeed = 0;
+
+	// Line shift
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LineShiftCFG")
+		class UAnimMontage* ShiftMontage = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LineShiftCFG")
+		float ShiftMontagePlaySpeed = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LineShiftCFG")
+		float ShiftOffsetAnimTimeRate = 0.01f;
+
+public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
 
@@ -87,16 +117,13 @@ public:
 		void OverScores(int32 Scores);
 	void OverProgress();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
-		ESpeedChangeTypes SpeedChangeTypes = ESpeedChangeTypes::FirstType;
+	// EndGame
+	bool DeadEvent();
+	UFUNCTION(BlueprintNativeEvent)
+		void CharDead_BP();
 
-	/** Line shift */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LineShiftCFG")
-		class UAnimMontage* ShiftMontage = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LineShiftCFG")
-		float ShiftMontagePlaySpeed = 1.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LineShiftCFG")
-		float ShiftOffsetTimeRate = 0.01f;
+public:
+	
 	//Check whether its left or right lane
 	bool bShiftLeft = false;
 	//CharacterOffcetStrengthWhileSwitchingLanes
@@ -110,30 +137,6 @@ public:
 	EMovementLine CurrentLine = EMovementLine::LINE_2;
 	EMovementLine DestinationLine = EMovementLine::LINE_2;
 
-	//Amount of boost your speed get after each iteration
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "1200", UIMin = "0", UIMax = "1200"), Category = "RunnerCFG")
-		float SpeedRiseValue = 0.0f;
-
-	//Need to adjust how often you get speed rise with "Increase Speed OverTime" Mode On
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
-		float TimeUntillSpeedUp = 0.0f;
-
 	bool isOverScores = false;
-
-	//Distance the character need to overcome before he get a speedboost
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
-		float DistanceToRiseUpSpeed = 0.0f;
 	FVector CoordToRiseSpeed;
-
-	//Scores count the character need to collect before he get a speedboost
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
-		int32 AmountOfScoresToRiseUpSpeed = 0;
-	//Show off debug info
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
-		bool Debug = false;
-
-	bool DeadEvent();
-
-	UFUNCTION(BlueprintNativeEvent)
-		void CharDead_BP();
 };

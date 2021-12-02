@@ -21,10 +21,6 @@ void ARunnerGameMode::BeginPlay()
 
 }
 
-void ARunnerGameMode::SpawnEvent(AMapPartBase* Tile)
-{
-}
-
 void ARunnerGameMode::SpawnMapPart()
 {
 	GameMap->CreateNewTile();
@@ -39,26 +35,6 @@ void ARunnerGameMode::ChangeScores(int32 Amount)
 int32 ARunnerGameMode::GetCurrentScores()
 {
 	return CurrentPoints;
-}
-
-void ARunnerGameMode::Spawn(AMapPartBase* Tile)
-{
-	int8 SpawnChance = FMath::RandRange(0, 100);
-
-	if (SpawnChance <= PercentSpawnChance)
-	{
-		int8 Lanestooccupy = FMath::RandRange(0, 100);
-		if (Lanestooccupy <= 50)
-		{
-			SpawnObstacle(false, Tile);
-		}
-		else
-		{
-			SpawnObstacle(true, Tile);
-		}
-	}
-	if (SpawnChance <= 90)
-		SpawnPickUp(Tile);
 }
 
 void ARunnerGameMode::SpawnPickUp(AMapPartBase* MapTile)
