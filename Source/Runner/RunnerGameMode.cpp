@@ -18,7 +18,6 @@ void ARunnerGameMode::BeginPlay()
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	GameMap = Cast<AMapPawn>(GetWorld()->SpawnActor(MapClass, &NewTransform, SpawnParams));
-
 }
 
 void ARunnerGameMode::SpawnMapPart()

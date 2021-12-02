@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MapPawn.h"
+#include "RunnerGameInstance.h"
 
 // Sets default values
 AMapPawn::AMapPawn()
@@ -14,9 +15,23 @@ void AMapPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// get tiles
+	TArray<FTileInfo> AllTiles;
+	URunnerGameInstance* GameInst = Cast<URunnerGameInstance>(GetGameInstance());
+	if (GameInst && GameInst->GetTiles(AllTiles))
+	{
+		for (const auto& tile : AllTiles)
+		{
+			if (tile.Type == ETileType::Default)
+				MapBasicTiles.Add(tile);
+			else if (tile.Type == ETileType::QTE)
+				MapQTETiles.Add(tile);
+		}
+	}
+
 	// create tiles at start
 	for (int8 i = 0; i < MapStartTileNum; ++i) {
-		CreateNewTile();
+		CreateNewTile(true);
 	}
 }
 
@@ -56,7 +71,7 @@ void AMapPawn::AddTileToMap(AMapPartBase* Tile)
 	}
 }
 
-void AMapPawn::CreateNewTile()
+void AMapPawn::CreateNewTile(bool bOnlyBasic)
 {
 	// delete last before spawn new
 	if (CurrentMapLength >= MapMaxTileNum)
@@ -76,8 +91,15 @@ void AMapPawn::CreateNewTile()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	SpawnParams.Owner = this;
 
+	// determine tile type
+	TSubclassOf<AMapPartBase> TileClass;
+	if (bOnlyBasic)
+		TileClass = MapBasicTiles[0].TileClass;
+	else 
+		TileClass = GetTileType();
+
 	// spawn
-	AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(MapElementsTypes[0], &NewTransform, SpawnParams));
+	AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(TileClass, &NewTransform, SpawnParams));
 	if (NewPart)
 	{
 		AddTileToMap(NewPart);
@@ -85,32 +107,24 @@ void AMapPawn::CreateNewTile()
 	}
 }
 
-// TODO
-//void GetTileType()
-//{
-//	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-//	int8 TileForSpawn = FMath::RandRange(0, 100);
-//	if (TileForSpawn <= 10)
-//	{
-//		AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(MapParts[1], &SpawnPoint, SpawnParams));
-//		if (NewPart)
-//		{
-//			FVector Location = NewPart->ArrowComp->GetComponentLocation();
-//			SpawnPoint.SetLocation(Location);
-//			SpawnEvent(NewPart);
-//		}
-//	}
-//	else
-//	{
-//		AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(MapParts[0], &SpawnPoint, SpawnParams));
-//		if (NewPart)
-//		{
-//			FVector Location = NewPart->ArrowComp->GetComponentLocation();
-//			SpawnPoint.SetLocation(Location);
-//			Spawn(NewPart);
-//		}
-//	}
-//}
+// TODO: expand logic for tile generator
+TSubclassOf<AMapPartBase> AMapPawn::GetTileType()
+{
+	int8 SeedForSpawn = FMath::RandRange(0, 100);
+	TSubclassOf<AMapPartBase> NewTileClass;
+	UE_LOG(LogTemp, Warning, TEXT("AMapPawn::GetTileType: [INfo] SeedForSpawn - %i"), SeedForSpawn);
+	if (SeedForSpawn < 30)
+	{
+		// test
+		NewTileClass = MapQTETiles[0].TileClass;
+	}
+	else
+	{
+		// test
+		NewTileClass = MapBasicTiles[0].TileClass;
+	}
+	return NewTileClass;
+}
 
 void AMapPawn::DeleteLastTile()
 {

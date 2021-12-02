@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "MapPartBase.h"
+#include "Types.h"
 #include "MapPawn.generated.h"
 
 struct Node
@@ -21,9 +21,6 @@ class RUNNER_API AMapPawn : public APawn
 public:
 	// Sets default values for this pawn's properties
 	AMapPawn();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawmTile")
-		TArray<TSubclassOf<AMapPartBase>> MapElementsTypes;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapParams")
 		int32 MapMaxTileNum = 5;
@@ -39,7 +36,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION(BlueprintCallable)
-		void CreateNewTile();
+		void CreateNewTile(bool bOnlyBasic = false);
 	UFUNCTION(BlueprintCallable)
 		void DeleteLastTile();
 
@@ -48,8 +45,12 @@ protected:
 	virtual void BeginPlay() override;
 
 	void AddTileToMap(AMapPartBase* Tile);
+	TSubclassOf<AMapPartBase> GetTileType();
 
 protected:
+
+	TArray<FTileInfo> MapBasicTiles;
+	TArray<FTileInfo> MapQTETiles;
 
 	Node* MapHead = nullptr;
 	Node* MapTail = nullptr;

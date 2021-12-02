@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-//#include "MapPartBase.h"
 #include "MapPawn.h"
 #include "RunnerGameMode.generated.h"
 
