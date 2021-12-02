@@ -4,16 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "MapPartBase.h"
+#include "Types.h"
 #include "MapPawn.generated.h"
 
 struct Node
 {
-	AMapPartBase* Tile;
-	struct Node* Next;
-	struct Node* Prev;
+	AMapPartBase* Tile = nullptr;
+	struct Node* Next = nullptr;
 };
-
 
 UCLASS()
 class RUNNER_API AMapPawn : public APawn
@@ -23,27 +21,38 @@ class RUNNER_API AMapPawn : public APawn
 public:
 	// Sets default values for this pawn's properties
 	AMapPawn();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapParams")
+		int32 MapMaxTileNum = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapParams")
+		int32 MapStartTileNum = 3;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawmTile")
-		TArray<TSubclassOf<AMapPartBase>> MapElementsTypes;
+public:	
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION(BlueprintCallable)
+		void CreateNewTile(bool bOnlyBasic = false);
+	UFUNCTION(BlueprintCallable)
+		void DeleteLastTile();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	UFUNCTION(BlueprintCallable)
-		void AddTileToMap(AMapPartBase* Tile);
-	UFUNCTION(BlueprintCallable)
-		void CreateNewTile();
-
-	void DeleteLastTile();
+	void AddTileToMap(AMapPartBase* Tile);
+	TSubclassOf<AMapPartBase> GetTileType();
 
 protected:
 
-	Node* Head = nullptr;
-	FTimerHandle DestoyTileTimer;
+	TArray<FTileInfo> MapBasicTiles;
+	TArray<FTileInfo> MapQTETiles;
+
+	Node* MapHead = nullptr;
+	Node* MapTail = nullptr;
+	int32 CurrentMapLength = 0;
 };

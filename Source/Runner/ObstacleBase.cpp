@@ -3,7 +3,7 @@
 
 #include "ObstacleBase.h"
 #include "Components/BoxComponent.h"
-#include"RunnerCharacter.h"
+#include "RunnerCharacter.h"
 
 // Sets default values
 AObstacleBase::AObstacleBase()

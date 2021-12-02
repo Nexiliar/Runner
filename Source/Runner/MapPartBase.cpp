@@ -16,8 +16,11 @@ AMapPartBase::AMapPartBase()
 	FloorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SM_Floor"));
 	FloorMesh->SetupAttachment(RootComponent);
 
-	ArrowComp = CreateDefaultSubobject<UArrowComponent>(TEXT("AttachPoint"));
-	ArrowComp->SetupAttachment(FloorMesh);
+	ArrowEndLocComp = CreateDefaultSubobject<UArrowComponent>(TEXT("EndLocation"));
+	ArrowEndLocComp->SetupAttachment(FloorMesh);
+
+	TileLocation = CreateDefaultSubobject<UArrowComponent>(TEXT("WorldLocation"));
+	TileLocation->SetupAttachment(FloorMesh);
 
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("EventBox"));
 	BoxComponent->SetupAttachment(FloorMesh);
@@ -28,11 +31,6 @@ AMapPartBase::AMapPartBase()
 	Mid->SetupAttachment(FloorMesh);
 	Right = CreateDefaultSubobject<UArrowComponent>(TEXT("Right"));
 	Right->SetupAttachment(FloorMesh);
-}
-
-AMapPartBase::~AMapPartBase()
-{
-	//DestroyTile();
 }
 
 // Called when the game starts or when spawned
@@ -46,7 +44,7 @@ void AMapPartBase::BeginPlay()
 		OccupiedLanes[i] = false;
 	}
 	//Spawn();
-	//BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AMapPartBase::CollisionBoxBeginOverlap);
+	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AMapPartBase::CollisionBoxBeginOverlap);
 }
 
 // Called every frame
@@ -57,13 +55,19 @@ void AMapPartBase::Tick(float DeltaTime)
 
 void AMapPartBase::CollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (Gamemode)
+	if (bCollidePersonOnce)
 	{
-		Gamemode->ChangeScores(10);
-		Gamemode->SpawnMapPart();
+		ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		if (Gamemode)
+		{
+			Gamemode->ChangeScores(10);
+			Gamemode->SpawnMapPart();
+		}
+
+		// prevent multiple overlap
+		bCollidePersonOnce = false;
 	}
-	GetWorld()->GetTimerManager().SetTimer(DestoyTimerHandle, this, &AMapPartBase::DestroyTile, 3.0f, false);
+	
 }
 
 FVector AMapPartBase::SpawnRules()

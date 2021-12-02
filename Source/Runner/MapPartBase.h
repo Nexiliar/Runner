@@ -21,14 +21,16 @@ class RUNNER_API AMapPartBase : public AActor
 public:
 	// Sets default values for this actor's properties
 	AMapPartBase();
-	~AMapPartBase();
 
+	// Editable in BP
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
 		class USceneComponent* SceneComp = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
 		class UStaticMeshComponent* FloorMesh = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
-		class UArrowComponent* ArrowComp = nullptr;
+		class UArrowComponent* ArrowEndLocComp = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
+		class UArrowComponent* TileLocation = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
 		class UBoxComponent* BoxComponent = nullptr;
 
@@ -43,18 +45,21 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	bool bCollidePersonOnce = true;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	FTimerHandle DestoyTimerHandle;
 	UFUNCTION()
-		virtual	void  CollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		virtual	void CollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	FVector SpawnRules();
+	void DestroyTile();
+
+public:
+
 	TArray<bool> OccupiedLanes;
 	TArray<AActor*> Children;
 	FVector LocactionForSpawn;
-
-	void DestroyTile();
 };
