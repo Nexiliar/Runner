@@ -2,6 +2,8 @@
 
 #include "MapPawn.h"
 #include "RunnerGameInstance.h"
+#include "RunnerGameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AMapPawn::AMapPawn()
@@ -94,10 +96,15 @@ void AMapPawn::CreateNewTile(bool bOnlyBasic)
 
 	// determine tile type
 	TSubclassOf<AMapPartBase> TileClass;
+	ETileType Type = ETileType::None;
+
 	if (bOnlyBasic)
+	{
 		TileClass = MapBasicTiles[0].TileClass;
+		Type = ETileType::Default;
+	}
 	else 
-		TileClass = GetTileType();
+		std::tie(Type, TileClass) = GetTileType();
 
 	// spawn
 	AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(TileClass, &NewTransform, SpawnParams));
@@ -105,26 +112,56 @@ void AMapPawn::CreateNewTile(bool bOnlyBasic)
 	{
 		AddTileToMap(NewPart);
 		CurrentMapLength++;
+
+		if (!bOnlyBasic && Type == ETileType::Default)
+			SpawnObstacle(false, NewPart);
 	}
 }
 
 // TODO: expand logic for tile generator
-TSubclassOf<AMapPartBase> AMapPawn::GetTileType()
+std::pair<ETileType, TSubclassOf<AMapPartBase>> AMapPawn::GetTileType()
 {
 	int8 SeedForSpawn = FMath::RandRange(0, 100);
 	TSubclassOf<AMapPartBase> NewTileClass;
+	ETileType Type = ETileType::None;
+
 	UE_LOG(LogTemp, Warning, TEXT("AMapPawn::GetTileType: [INfo] SeedForSpawn - %i"), SeedForSpawn);
 	if (SeedForSpawn < 30)
 	{
 		// test
 		NewTileClass = MapQTETiles[0].TileClass;
+		Type = ETileType::QTE;
 	}
 	else
 	{
 		// test
 		NewTileClass = MapBasicTiles[0].TileClass;
+		Type = ETileType::Default;
 	}
-	return NewTileClass;
+
+	return std::make_pair(Type, NewTileClass);
+}
+
+
+void AMapPawn::SpawnObstacle(bool TwoObjects, AMapPartBase* MapTile)
+{
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	SpawnParams.Owner = this;
+	FRotator Rot = MapTile->GetActorRotation();
+
+	int8 RandObstacleType = FMath::RandRange(0, Obstacles.Num() - 1);
+	FVector SpawnLocation = MapTile->SpawnRules();
+
+	AObstacleBase* Obstacle = Cast<AObstacleBase>(GetWorld()->SpawnActor(Obstacles[RandObstacleType], &SpawnLocation, &Rot, SpawnParams));
+	if (Obstacle)
+	{
+		MapTile->Children.Add(Obstacle);
+	}
+	if (TwoObjects)
+	{
+		SpawnObstacle(false, MapTile);
+	}
 }
 
 void AMapPawn::DeleteLastTile()

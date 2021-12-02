@@ -32,8 +32,6 @@ public:
 	//PickUp Classess to randomly spawn on tile
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
 		TArray<TSubclassOf<class APickUpBase>> PickUps;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
-		TArray<TSubclassOf<class AObstacleBase>> Obstacles;
 
 	//SpawnChance for obstacles
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "100", UIMin = "0", UIMax = "100"), Category = "MapPartSpawningSettings")
@@ -51,9 +49,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Points")
 		int32 GetCurrentScores();
-
-	void SpawnPickUp(AMapPartBase* MapTile);
-	void SpawnObstacle(bool TwoObjects, AMapPartBase* MapTile);
 
 protected:
 	int32 CurrentPoints;

@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapParams")
 		int32 MapStartTileNum = 3;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
+		TArray<TSubclassOf<class AObstacleBase>> Obstacles;
+
 public:	
 
 	// Called every frame
@@ -40,12 +43,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void DeleteLastTile();
 
+	void SpawnObstacle(bool TwoObjects, AMapPartBase* MapTile);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void AddTileToMap(AMapPartBase* Tile);
-	TSubclassOf<AMapPartBase> GetTileType();
+	std::pair<ETileType, TSubclassOf<AMapPartBase>> GetTileType();
 
 protected:
 
