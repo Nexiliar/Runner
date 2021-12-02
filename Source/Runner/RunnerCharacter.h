@@ -76,7 +76,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LineShiftCFG")
 		float ShiftMontagePlaySpeed = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LineShiftCFG")
-		float ShiftOffsetAnimTimeRate = 0.01f;
+		float ShiftOffsetAnimTimeRate = 0.001f;
 
 public:
 	virtual void Tick(float DeltaSeconds) override;
