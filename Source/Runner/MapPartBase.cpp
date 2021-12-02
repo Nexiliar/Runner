@@ -63,7 +63,6 @@ void AMapPartBase::CollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedCompo
 			Gamemode->ChangeScores(10);
 			Gamemode->SpawnMapPart();
 		}
-		//UE_LOG(LogTemp, Warning, TEXT("AMapPartBase::CollisionBoxBeginOverlap -  %s"), *this->GetName());
 
 		// prevent multiple overlap
 		bCollidePersonOnce = false;

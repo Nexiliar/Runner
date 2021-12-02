@@ -35,26 +35,23 @@ void AMapPawn::AddTileToMap(AMapPartBase* Tile)
 {
 	if (Tile)
 	{
-		if (!Head)
+		if (!MapHead)
 		{
 			// create head node
-			Head = new Node();
-			Head->Tile = Tile;
-			Head->Prev = Head;
-			Head->Next = Head;
+			MapHead = new Node();
+			MapHead->Tile = Tile;
+			MapTail = MapHead;
+			MapHead->Next = MapTail;
 		}
 		else
 		{
-			Node* NewNode = new Node();
-
 			// create new Node
+			Node* NewNode = new Node();
 			NewNode->Tile = Tile;
-			NewNode->Prev = Head->Prev;
-			NewNode->Next = Head;
 
 			// modify chain
-			Head->Prev->Next = NewNode;
-			Head->Prev = NewNode;
+			MapTail->Next = NewNode;
+			MapTail = NewNode;
 		}
 	}
 }
@@ -67,24 +64,23 @@ void AMapPawn::CreateNewTile()
 		DeleteLastTile();
 	}
 
+	// get new tile spawn location
 	FVector NewLocation = FVector(0.0f, 0.0f, 0.0f);
-	if (!Head)
+	if (!MapHead)
 		NewLocation = GetActorLocation();
 	else
-	{
-		NewLocation = Head->Prev->Tile->ArrowEndLocComp->GetComponentTransform().GetLocation();
-	}
+		NewLocation = MapTail->Tile->ArrowEndLocComp->GetComponentTransform().GetLocation();
 
 	FTransform NewTransform(NewLocation);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	SpawnParams.Owner = this;
 
-	CurrentMapLength++;
-	//UE_LOG(LogTemp, Warning, TEXT("AMapPawn::CreateNewTile ArrowLoc -  %s, TileNum - %i"), *NewLocation.ToString(), CurrentMapLength);
-
+	// spawn
 	AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(MapElementsTypes[0], &NewTransform, SpawnParams));
 	AddTileToMap(NewPart);
+
+	CurrentMapLength++;
 }
 
 // TODO
@@ -116,16 +112,13 @@ void AMapPawn::CreateNewTile()
 
 void AMapPawn::DeleteLastTile()
 {
-	if (Head->Prev != Head)
+	if (MapHead->Next != MapHead)
 	{
-		Node* NewHead = Head->Next;
-		NewHead->Prev = Head->Prev;
-		Head->Prev->Next = NewHead;
-
-		Head->Tile->DestroyTile();
-		Head = NewHead;
+		Node* NewHead = MapHead->Next;
+		
+		MapHead->Tile->DestroyTile();
+		MapHead = NewHead;
 
 		CurrentMapLength--;
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("AMapPawn::DeleteLastTile: TileNum - %i"), CurrentMapLength);
 }

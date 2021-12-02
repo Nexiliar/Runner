@@ -9,9 +9,8 @@
 
 struct Node
 {
-	AMapPartBase* Tile;
-	struct Node* Next;
-	struct Node* Prev;
+	AMapPartBase* Tile = nullptr;
+	struct Node* Next = nullptr;
 };
 
 UCLASS()
@@ -31,13 +30,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapParams")
 		int32 MapStartTileNum = 3;
 
-protected:
+public:	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void AddTileToMap(AMapPartBase* Tile);
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -51,8 +47,11 @@ public:
 		void DeleteLastTile();
 
 protected:
+	void AddTileToMap(AMapPartBase* Tile);
 
-	Node* Head = nullptr;
-	FTimerHandle DestoyTileTimer;
+protected:
+
+	Node* MapHead = nullptr;
+	Node* MapTail = nullptr;
 	int32 CurrentMapLength = 0;
 };
