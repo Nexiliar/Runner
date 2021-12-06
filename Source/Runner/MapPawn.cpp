@@ -32,9 +32,10 @@ void AMapPawn::BeginPlay()
 	}
 
 	// create tiles at start
-	for (int8 i = 0; i < MapStartTileNum; ++i) 
+	CreateNewTile(true); // start without obstalces
+	for (int8 i = 1; i < MapStartTileNum; ++i) 
 	{
-		CreateNewTile(true);
+		CreateNewTile();
 	}
 }
 
@@ -104,7 +105,8 @@ void AMapPawn::CreateNewTile(bool bOnlyBasic)
 
 	if (bOnlyBasic)
 	{
-		TileClass = MapBasicTiles[0].TileClass;
+		int32 Rand = FMath::RandRange(0, MapBasicTiles.Num()-1);
+		TileClass = MapBasicTiles[Rand].TileClass;
 		Type = ETileType::Default;
 	}
 	else
@@ -137,7 +139,8 @@ std::pair<ETileType, TSubclassOf<AMapPartBase>> AMapPawn::GetTileType()
 	if (FMath::RandRange(0, 100) < TileQTESpawnChance)
 	{
 		// test
-		NewTileClass = MapQTETiles[0].TileClass;
+		int32 Rand = FMath::RandRange(0, MapBasicTiles.Num() - 1);
+		NewTileClass = MapQTETiles[Rand].TileClass;
 		Type = ETileType::QTE;
 		TileQTESpawnChance = 0;
 	}
@@ -146,7 +149,8 @@ std::pair<ETileType, TSubclassOf<AMapPartBase>> AMapPawn::GetTileType()
 		// test
 		TileQTESpawnChance = (TileQTESpawnChance >= QTESpawnChance) ? 30 : (TileQTESpawnChance + 5);
 		
-		NewTileClass = MapBasicTiles[0].TileClass;
+		int32 Rand = FMath::RandRange(0, MapBasicTiles.Num() - 1);
+		NewTileClass = MapBasicTiles[Rand].TileClass;
 		Type = ETileType::Default;
 	}
 	UE_LOG(LogTemp, Warning, TEXT("AMapPawn::GetTileType: [INfo] NewTyle - %s"), *UEnum::GetValueAsString(Type));
