@@ -128,10 +128,13 @@ public:
 	bool bShiftLeft = false;
 	//CharacterOffcetStrengthWhileSwitchingLanes
 	FVector ShiftDestinationPos = FVector(0.0f, 0.0f, 0.0f);
+	
 	float LineOffset = 300.f;
 	bool bShifting = false;
+	
 	float TimeToShift = 1.0f;
-	float ShiftMontagePlayTime = 1.0f;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	float ShiftMontagePlayTime = 0.1f;
 
 	//SwitchLaneVariables
 	EMovementLine CurrentLine = EMovementLine::LINE_2;
