@@ -26,6 +26,8 @@ public:
 		int32 MapMaxTileNum = 5;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapParams")
 		int32 MapStartTileNum = 3;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapParams")
+		int32 QTESpawnChance = 30; // in percent
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
 		TArray<TSubclassOf<class AObstacleBase>> Obstacles;
@@ -60,4 +62,5 @@ protected:
 	Node* MapHead = nullptr;
 	Node* MapTail = nullptr;
 	int32 CurrentMapLength = 0;
+	int32 TileQTESpawnChance = 0;
 };

@@ -134,7 +134,7 @@ public:
 	
 	float TimeToShift = 1.0f;
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
-	float ShiftMontagePlayTime = 0.1f;
+	float ShiftMontagePlayTime = 1.0f;
 
 	//SwitchLaneVariables
 	EMovementLine CurrentLine = EMovementLine::LINE_2;

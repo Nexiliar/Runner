@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MapPartBase.h"
-
+#include "RunnerCharacter.h"
 #include "RunnerGameMode.h"
 
 // Sets default values
@@ -17,13 +17,13 @@ AMapPartBase::AMapPartBase()
 	FloorMesh->SetupAttachment(RootComponent);
 
 	ArrowEndLocComp = CreateDefaultSubobject<UArrowComponent>(TEXT("EndLocation"));
-	ArrowEndLocComp->SetupAttachment(FloorMesh);
+	ArrowEndLocComp->SetupAttachment(RootComponent);
 
 	TileLocation = CreateDefaultSubobject<UArrowComponent>(TEXT("WorldLocation"));
-	TileLocation->SetupAttachment(FloorMesh);
+	TileLocation->SetupAttachment(RootComponent);
 
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("EventBox"));
-	BoxComponent->SetupAttachment(FloorMesh);
+	BoxComponent->SetupAttachment(RootComponent);
 
 	Left = CreateDefaultSubobject<UArrowComponent>(TEXT("Left"));
 	Left->SetupAttachment(FloorMesh);
@@ -55,7 +55,10 @@ void AMapPartBase::Tick(float DeltaTime)
 
 void AMapPartBase::CollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (bCollidePersonOnce)
+	UE_LOG(LogTemp, Warning, TEXT("AMapPartBase::CollisionBoxBeginOverlap: [INfo] Tile - %s"), *this->GetName());
+
+	ARunnerCharacter* Char = Cast<ARunnerCharacter>(OtherActor);
+	if (bCollidePersonOnce && Char)
 	{
 		ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (Gamemode)

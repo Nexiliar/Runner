@@ -87,7 +87,11 @@ void AMapPawn::CreateNewTile(bool bOnlyBasic)
 	if (!MapHead)
 		NewLocation = GetActorLocation();
 	else
+	{
 		NewLocation = MapTail->Tile->ArrowEndLocComp->GetComponentTransform().GetLocation();
+		UE_LOG(LogTemp, Warning, TEXT("NewLocation is %s"), *NewLocation.ToString());
+	}
+		
 
 	FTransform NewTransform(NewLocation);
 	FActorSpawnParameters SpawnParams;
@@ -103,42 +107,49 @@ void AMapPawn::CreateNewTile(bool bOnlyBasic)
 		TileClass = MapBasicTiles[0].TileClass;
 		Type = ETileType::Default;
 	}
-	else 
-		std::tie(Type, TileClass) = GetTileType();
-
-	// spawn
-	AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(TileClass, &NewTransform, SpawnParams));
-	if (NewPart)
+	else
 	{
+		std::tie(Type, TileClass) = GetTileType();
+		UE_LOG(LogTemp, Warning, TEXT("CreateNewTile: Type is %s"), *UEnum::GetValueAsString(Type));
+	}
+		
+	// spawn
+	if (Type != ETileType::None)
+	{
+		AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(TileClass, &NewTransform, SpawnParams));
 		AddTileToMap(NewPart);
 		CurrentMapLength++;
 
-		if (!bOnlyBasic && Type == ETileType::Default)
+		if (!bOnlyBasic && (Type == ETileType::Default))
 			SpawnObstacle(false, NewPart);
-	}
+
+	}		
 }
 
 // TODO: expand logic for tile generator
 std::pair<ETileType, TSubclassOf<AMapPartBase>> AMapPawn::GetTileType()
 {
-	int8 SeedForSpawn = FMath::RandRange(0, 100);
+	//int8 SeedForSpawn = FMath::RandRange(0, 100);
 	TSubclassOf<AMapPartBase> NewTileClass;
 	ETileType Type = ETileType::None;
 
-	UE_LOG(LogTemp, Warning, TEXT("AMapPawn::GetTileType: [INfo] SeedForSpawn - %i"), SeedForSpawn);
-	if (SeedForSpawn < 30)
+	//
+	if (FMath::RandRange(0, 100) < TileQTESpawnChance)
 	{
 		// test
 		NewTileClass = MapQTETiles[0].TileClass;
 		Type = ETileType::QTE;
+		TileQTESpawnChance = 0;
 	}
 	else
 	{
 		// test
+		TileQTESpawnChance = (TileQTESpawnChance >= QTESpawnChance) ? 30 : (TileQTESpawnChance + 5);
+		
 		NewTileClass = MapBasicTiles[0].TileClass;
 		Type = ETileType::Default;
 	}
-
+	UE_LOG(LogTemp, Warning, TEXT("AMapPawn::GetTileType: [INfo] NewTyle - %s"), *UEnum::GetValueAsString(Type));
 	return std::make_pair(Type, NewTileClass);
 }
 
