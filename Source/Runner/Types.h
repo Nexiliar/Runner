@@ -8,6 +8,23 @@
 #include "MapPartBase.h"
 #include "Types.generated.h"
 
+
+UENUM(BlueprintType)
+enum class EMovementLine : uint8
+{
+	LINE_1,
+	LINE_2,
+	LINE_3
+};
+
+UENUM(BlueprintType)
+enum class ESpeedChangeTypes : uint8
+{
+	FirstType UMETA(DisplayName = "Increase Speed OverTime"),
+	SecondType UMETA(DisplayName = "Increase Speed Over Scores"),
+	ThirdType UMETA(DisplayName = "Increase Speed Over Certain Map Progress")
+};
+
 UENUM(BlueprintType)
 enum class ETileType : uint8
 {
