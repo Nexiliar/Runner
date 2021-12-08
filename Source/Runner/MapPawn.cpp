@@ -139,7 +139,7 @@ std::pair<ETileType, TSubclassOf<AMapPartBase>> AMapPawn::GetTileType()
 	if (FMath::RandRange(0, 100) < TileQTESpawnChance)
 	{
 		// test
-		int32 Rand = FMath::RandRange(0, MapBasicTiles.Num() - 1);
+		int32 Rand = FMath::RandRange(0, MapQTETiles.Num() - 1);
 		NewTileClass = MapQTETiles[Rand].TileClass;
 		Type = ETileType::QTE;
 		TileQTESpawnChance = 0;
