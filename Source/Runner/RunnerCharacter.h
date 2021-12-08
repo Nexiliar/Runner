@@ -4,23 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Types.h"
 #include "RunnerCharacter.generated.h"
-
-UENUM(BlueprintType)
-enum class ESpeedChangeTypes : uint8
-{
-	FirstType UMETA(DisplayName = "Increase Speed OverTime"),
-	SecondType UMETA(DisplayName = "Increase Speed Over Scores"),
-	ThirdType UMETA(DisplayName = "Increase Speed Over Certain Map Progress")
-};
-
-UENUM(BlueprintType)
-enum class EMovementLine : uint8
-{
-	LINE_1,
-	LINE_2,
-	LINE_3
-};
 
 UCLASS(config = Game)
 class ARunnerCharacter : public ACharacter
@@ -126,15 +111,12 @@ public:
 	
 	//Check whether its left or right lane
 	bool bShiftLeft = false;
-	//CharacterOffcetStrengthWhileSwitchingLanes
 	FVector ShiftDestinationPos = FVector(0.0f, 0.0f, 0.0f);
-	
 	float LineOffset = 300.f;
 	bool bShifting = false;
-	
-	float TimeToShift = 1.0f;
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	float TimeToShift = 0.2f;
 	float ShiftMontagePlayTime = 1.0f;
+	float AxisY_Offset = 0.0f;
 
 	//SwitchLaneVariables
 	EMovementLine CurrentLine = EMovementLine::LINE_2;
