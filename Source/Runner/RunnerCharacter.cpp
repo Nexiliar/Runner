@@ -103,9 +103,19 @@ void ARunnerCharacter::MoveForward(float Value)
 	}
 }
 
+void ARunnerCharacter::EnableInputsHandling()
+{
+	bKeysHandlingEnabled = true;
+}
+
+void ARunnerCharacter::DisableInputsHandling()
+{
+	bKeysHandlingEnabled = false;
+}
+
 void ARunnerCharacter::SwitchRoadLeft()
 {
-	if (CurrentLine != EMovementLine::LINE_1 && !bShifting) 
+	if (CurrentLine != EMovementLine::LINE_1 && bKeysHandlingEnabled)
 	{		
 		bShiftLeft = true;
 		CurrentLine = (CurrentLine == EMovementLine::LINE_3) ? EMovementLine::LINE_2 : EMovementLine::LINE_1;
@@ -117,7 +127,7 @@ void ARunnerCharacter::SwitchRoadLeft()
 
 void ARunnerCharacter::SwitchRoadRight()
 {
-	if (CurrentLine != EMovementLine::LINE_3 && !bShifting)
+	if (CurrentLine != EMovementLine::LINE_3 && bKeysHandlingEnabled)
 	{
 		bShiftLeft = false;
 		CurrentLine = (CurrentLine == EMovementLine::LINE_1) ? EMovementLine::LINE_2 : EMovementLine::LINE_3;
@@ -130,7 +140,7 @@ void ARunnerCharacter::SwitchRoadRight()
 void ARunnerCharacter::StartShiftingLine()
 {
 	// block input
-	bShifting = true;
+	DisableInputsHandling();
 
 	// play montage
 	if (ShiftMontage)
@@ -162,7 +172,7 @@ void ARunnerCharacter::OffsetCharacterToLane()
 			GetCapsuleComponent()->AddWorldOffset(FVector(0.0f, ShiftDestinationPos.Y - GetActorLocation().Y, 0.0f));
 		
 		// unblock input
-		bShifting = false;
+		EnableInputsHandling();
 	}
 	else
 	{

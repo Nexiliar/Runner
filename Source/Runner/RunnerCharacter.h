@@ -89,6 +89,13 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+	// Toggle Inputs Handling
+	UFUNCTION(BlueprintCallable)
+		void EnableInputsHandling();
+	UFUNCTION(BlueprintCallable)
+		void DisableInputsHandling();
+
+
 	//SwitchLaneFunctions
 	void SwitchRoadLeft();
 	void SwitchRoadRight();
@@ -107,16 +114,18 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 		void CharDead_BP();
 
-public:
+protected:
 	
 	//Check whether its left or right lane
 	bool bShiftLeft = false;
 	FVector ShiftDestinationPos = FVector(0.0f, 0.0f, 0.0f);
 	float LineOffset = 300.f;
-	bool bShifting = false;
 	float TimeToShift = 0.2f;
 	float ShiftMontagePlayTime = 1.0f;
 	float AxisY_Offset = 0.0f;
+
+	// Ignore Or Read inputs
+	bool bKeysHandlingEnabled = false;
 
 	//SwitchLaneVariables
 	EMovementLine CurrentLine = EMovementLine::LINE_2;

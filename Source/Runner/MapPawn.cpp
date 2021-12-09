@@ -119,7 +119,7 @@ void AMapPawn::CreateNewTile()
 	{
 		AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(TileClass, &NewTransform, SpawnParams));
 		//if (!bOnlyBasic && (Type == ETileType::Default))
-		//	SpawnObstacle(false, NewPart);
+		SpawnObstacle(false, NewPart);
 
 		// update map info
 		AddTileToMap(NewPart);
