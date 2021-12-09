@@ -64,7 +64,7 @@ void AGrinchCharacter::SwitchRoadLeft()
 		bShiftLeft = true;
 		CurrentLine = (CurrentLine == EMovementLine::LINE_3) ? EMovementLine::LINE_2 : EMovementLine::LINE_1;
 		ShiftDestinationPos = GetActorLocation() + FVector(0.0f, -LineOffset, 0.0f);
-		UE_LOG(LogTemp, Warning, TEXT("AGrinchCharacter::SwitchRoadLeft():  Location - %s, Destination - %s"), *GetActorLocation().ToString(), *ShiftDestinationPos.ToString());
+		//UE_LOG(LogTemp, Warning, TEXT("AGrinchCharacter::SwitchRoadLeft():  Location - %s, Destination - %s"), *GetActorLocation().ToString(), *ShiftDestinationPos.ToString());
 		StartShiftingLine();
 	}
 }
@@ -76,7 +76,7 @@ void AGrinchCharacter::SwitchRoadRight()
 		bShiftLeft = false;
 		CurrentLine = (CurrentLine == EMovementLine::LINE_1) ? EMovementLine::LINE_2 : EMovementLine::LINE_3;
 		ShiftDestinationPos = GetActorLocation() + FVector(0.0f, LineOffset, 0.0f);
-		UE_LOG(LogTemp, Warning, TEXT("AGrinchCharacter::SwitchRoadRight():  Location - %s, Destination - %s"), *GetActorLocation().ToString(), *ShiftDestinationPos.ToString());
+		//UE_LOG(LogTemp, Warning, TEXT("AGrinchCharacter::SwitchRoadRight():  Location - %s, Destination - %s"), *GetActorLocation().ToString(), *ShiftDestinationPos.ToString());
 		StartShiftingLine();
 	}
 }

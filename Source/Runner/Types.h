@@ -29,8 +29,9 @@ UENUM(BlueprintType)
 enum class ETileType : uint8
 {
 	None UMETA(DisplayName = "None"),
-	Default UMETA(DisplayName = "BasicTile"),
-	QTE UMETA(DisplayName = "QTE"),
+	StartEnvTile UMETA(DisplayName = "StartTile"),
+	BasicEnvTile UMETA(DisplayName = "BasicTile"),
+	EndEnvTile UMETA(DisplayName = "EndTile"),
 };
 
 UENUM(BlueprintType)
@@ -51,12 +52,12 @@ struct FTileInfo : public FTableRowBase
 		ETileType Type = ETileType::None;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
 		ELandscapeType Lanscape = ELandscapeType::None;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
-		FName TileName = FName("Tile");
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
+	//	FName TileName = FName("Tile");
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
 		TSubclassOf<AMapPartBase> TileClass = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
-		FTransform Transform;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
+	//	FTransform Transform;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
 		float PassTileScore = 10.0f;
 };

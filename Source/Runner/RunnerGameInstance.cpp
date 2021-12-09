@@ -16,7 +16,7 @@ bool URunnerGameInstance::GetTiles(TArray<FTileInfo>& OutTiles)
 			if (TileItem->Type != ETileType::None)
 			{
 				OutTiles.Add(*TileItem);
-				UE_LOG(LogTemp, Warning, TEXT("URunnerGameInstance::GetTiles: [INfo] Tile - %s"), *TileItem->TileName.ToString());
+				UE_LOG(LogTemp, Warning, TEXT("URunnerGameInstance::GetTiles: [INfo] Tile - %s"), *RowNames[i].ToString());
 			}
 			++i;
 		}

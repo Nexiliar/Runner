@@ -22,12 +22,14 @@ public:
 	// Sets default values for this pawn's properties
 	AMapPawn();
 	
+	// number of rendering tiles
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapParams")
-		int32 MapMaxTileNum = 5;
+		int32 MapMaxTileRuntimeNum = 5;
+	// number of tiles created at runtime
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapParams")
 		int32 MapStartTileNum = 3;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapParams")
-		int32 QTESpawnChance = 30; // in percent
+		float TimeToChangeLocation = 10.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
 		TArray<TSubclassOf<class AObstacleBase>> Obstacles;
@@ -41,7 +43,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION(BlueprintCallable)
-		void CreateNewTile(bool bOnlyBasic = false);
+		void CreateNewTile();
 	UFUNCTION(BlueprintCallable)
 		void DeleteLastTile();
 
@@ -53,14 +55,20 @@ protected:
 
 	void AddTileToMap(AMapPartBase* Tile);
 	std::pair<ETileType, TSubclassOf<AMapPartBase>> GetTileType();
+	ELandscapeType GetNextEnvironment();
+	bool CheckIfEnvExist(ELandscapeType NewEnv);
 
 protected:
 
-	TArray<FTileInfo> MapBasicTiles;
-	TArray<FTileInfo> MapQTETiles;
+	TMap<ELandscapeType, TArray<FTileInfo>> MapsAllTiles;
 
 	Node* MapHead = nullptr;
 	Node* MapTail = nullptr;
 	int32 CurrentMapLength = 0;
 	int32 TileQTESpawnChance = 0;
+
+	ETileType PrevTileType = ETileType::None;
+	ELandscapeType CurrentEnv = ELandscapeType::None;
+	bool bShouldChangeLocation = false;
+	FTimerHandle TimerHandle_ChangeLoc;
 };
