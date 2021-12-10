@@ -95,7 +95,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void DisableInputsHandling();
 
-
 	//SwitchLaneFunctions
 	void SwitchRoadLeft();
 	void SwitchRoadRight();
@@ -110,12 +109,13 @@ public:
 	void OverProgress();
 
 	// EndGame
-	bool DeadEvent();
+	UFUNCTION(BlueprintCallable)
+		bool KillChar();
 	UFUNCTION(BlueprintNativeEvent)
 		void CharDead_BP();
 
 protected:
-	
+
 	//Check whether its left or right lane
 	bool bShiftLeft = false;
 	FVector ShiftDestinationPos = FVector(0.0f, 0.0f, 0.0f);

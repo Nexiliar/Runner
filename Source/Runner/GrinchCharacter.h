@@ -13,8 +13,18 @@ class RUNNER_API AGrinchCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+		TSubclassOf<class APickUpBase> DropItemClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+		float CoinDistanceDrop = 300.0f;
+
+public:
 	// Sets default values for this character's properties
 	AGrinchCharacter();
+
+	UFUNCTION(BlueprintCallable)
+		void DropItem();
 
 protected:
 	// Called when the game starts or when spawned
@@ -30,7 +40,7 @@ protected:
 	void StartShiftingLine();
 	void OffsetCharacterToLane();
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

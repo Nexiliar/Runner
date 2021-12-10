@@ -8,7 +8,7 @@
 #include "RunnerGameInstance.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class RUNNER_API URunnerGameInstance : public UGameInstance
@@ -18,7 +18,7 @@ class RUNNER_API URunnerGameInstance : public UGameInstance
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTileDataBase")
 		UDataTable* MapTilesTable = nullptr;
-	
+
 public:
 	UFUNCTION(BlueprintCallable)
 		bool GetTiles(TArray<FTileInfo>& OutTiles);

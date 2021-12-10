@@ -1,17 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "RunnerGameInstance.h"
 
 bool URunnerGameInstance::GetTiles(TArray<FTileInfo>& OutTiles)
-{	
+{
 	bool res = true;
 	if (MapTilesTable) {
 		TArray<FName> RowNames = MapTilesTable->GetRowNames();
 
 		int8 i = 0;
 		while (i < RowNames.Num()) {
-			
 			FTileInfo* TileItem = MapTilesTable->FindRow<FTileInfo>(RowNames[i], "");
 			if (TileItem->Type != ETileType::None)
 			{

@@ -31,7 +31,7 @@ void AMapPawn::BeginPlay()
 	}
 
 	// create tiles at start
-	for (int8 i = 0; i < MapStartTileNum; ++i) 
+	for (int8 i = 0; i < MapStartTileNum; ++i)
 		CreateNewTile();
 }
 
@@ -107,13 +107,13 @@ void AMapPawn::CreateNewTile()
 		NewLocation = MapTail->Tile->ArrowEndLocComp->GetComponentTransform().GetLocation();
 		UE_LOG(LogTemp, Warning, TEXT("NewLocation is %s"), *NewLocation.ToString());
 	}
-	
+
 	// set spawn params
 	FTransform NewTransform(NewLocation);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	SpawnParams.Owner = this;
-		
+
 	// spawn in game
 	if ((Type != ETileType::None) && (CurrentEnv != ELandscapeType::None))
 	{
@@ -124,7 +124,7 @@ void AMapPawn::CreateNewTile()
 		// update map info
 		AddTileToMap(NewPart);
 		PrevTileType = Type;
-	}		
+	}
 }
 
 // determine type
@@ -133,7 +133,7 @@ std::pair<ETileType, TSubclassOf<AMapPartBase>> AMapPawn::GetTileType()
 	TSubclassOf<AMapPartBase> NewTileClass;
 	ETileType NewType = ETileType::None;
 
-	// spawn end tile for 
+	// spawn end tile for
 	if (bShouldChangeLocation)
 	{
 		NewType = ETileType::EndEnvTile;
@@ -147,7 +147,7 @@ std::pair<ETileType, TSubclassOf<AMapPartBase>> AMapPawn::GetTileType()
 	{
 		// determine env for new environment
 		CurrentEnv = GetNextEnvironment();
-		
+
 		// set new tile as start of new location
 		NewType = ETileType::StartEnvTile;
 
@@ -159,7 +159,7 @@ std::pair<ETileType, TSubclassOf<AMapPartBase>> AMapPawn::GetTileType()
 		// use basic
 		NewType = ETileType::BasicEnvTile;
 	}
-	
+
 	// get tile class
 	TArray<FTileInfo> EnvTiles = MapsAllTiles.FindRef(CurrentEnv);
 	if (EnvTiles.Num() > 0)
@@ -180,7 +180,7 @@ std::pair<ETileType, TSubclassOf<AMapPartBase>> AMapPawn::GetTileType()
 }
 
 ELandscapeType AMapPawn::GetNextEnvironment()
-{	
+{
 	TArray<ELandscapeType> MapEnvs;
 	MapsAllTiles.GetKeys(MapEnvs);
 
@@ -204,7 +204,7 @@ ELandscapeType AMapPawn::GetNextEnvironment()
 
 		i++;
 	}
-	
+
 	return NewEnv;
 }
 
@@ -212,7 +212,6 @@ bool AMapPawn::CheckIfEnvExist(ELandscapeType NewEnv)
 {
 	return MapsAllTiles.Contains(NewEnv);
 }
-
 
 void AMapPawn::SpawnObstacle(bool TwoObjects, AMapPartBase* MapTile)
 {

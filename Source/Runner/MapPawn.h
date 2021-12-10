@@ -21,7 +21,7 @@ class RUNNER_API AMapPawn : public APawn
 public:
 	// Sets default values for this pawn's properties
 	AMapPawn();
-	
+
 	// number of rendering tiles
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapParams")
 		int32 MapMaxTileRuntimeNum = 5;
@@ -34,7 +34,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
 		TArray<TSubclassOf<class AObstacleBase>> Obstacles;
 
-public:	
+public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

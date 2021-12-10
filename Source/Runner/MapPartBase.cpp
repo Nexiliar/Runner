@@ -70,7 +70,6 @@ void AMapPartBase::CollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedCompo
 		// prevent multiple overlap
 		bCollidePersonOnce = false;
 	}
-	
 }
 
 FVector AMapPartBase::SpawnRules()

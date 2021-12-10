@@ -116,7 +116,7 @@ void ARunnerCharacter::DisableInputsHandling()
 void ARunnerCharacter::SwitchRoadLeft()
 {
 	if (CurrentLine != EMovementLine::LINE_1 && bKeysHandlingEnabled)
-	{		
+	{
 		bShiftLeft = true;
 		CurrentLine = (CurrentLine == EMovementLine::LINE_3) ? EMovementLine::LINE_2 : EMovementLine::LINE_1;
 		ShiftDestinationPos = GetActorLocation() + FVector(0.0f, -LineOffset, 0.0f);
@@ -166,17 +166,17 @@ void ARunnerCharacter::OffsetCharacterToLane()
 	{
 		// ClearTimer
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle_SwitchLine);
-		
+
 		// Correct Position
 		if (ShiftMontage)
 			GetCapsuleComponent()->AddWorldOffset(FVector(0.0f, ShiftDestinationPos.Y - GetActorLocation().Y, 0.0f));
-		
+
 		// unblock input
 		EnableInputsHandling();
 	}
 	else
 	{
-		// move 
+		// move
 		FVector Offset(0.0f, AxisY_Offset, 0.0f);
 		AddActorWorldOffset(Offset);
 
@@ -184,7 +184,7 @@ void ARunnerCharacter::OffsetCharacterToLane()
 	}
 }
 
-//Trace to checkout is there is an obstacle
+//Trace to checkout is there is an obstacle TODO!!!
 bool ARunnerCharacter::CanSwitchLane(bool SwitchSide)
 {
 	bool Hit;
@@ -263,7 +263,7 @@ void ARunnerCharacter::OverProgress()
 	}
 }
 
-bool ARunnerCharacter::DeadEvent()
+bool ARunnerCharacter::KillChar()
 {
 	if (GetMesh())
 	{

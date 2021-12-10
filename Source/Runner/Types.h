@@ -8,7 +8,6 @@
 #include "MapPartBase.h"
 #include "Types.generated.h"
 
-
 UENUM(BlueprintType)
 enum class EMovementLine : uint8
 {
@@ -48,7 +47,7 @@ struct FTileInfo : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
 		ETileType Type = ETileType::None;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
 		ELandscapeType Lanscape = ELandscapeType::None;
@@ -63,11 +62,10 @@ struct FTileInfo : public FTableRowBase
 };
 
 /**
- * 
+ *
  */
 UCLASS()
 class RUNNER_API UTypes : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-	
 };

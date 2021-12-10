@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GrinchCharacter.h"
 
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "PickUpBase.h"
 
 // Sets default values
 AGrinchCharacter::AGrinchCharacter()
@@ -21,11 +21,24 @@ AGrinchCharacter::AGrinchCharacter()
 	GetCharacterMovement()->bRunPhysicsWithNoController = true;
 }
 
+void AGrinchCharacter::DropItem()
+{
+	FVector Location = GetActorLocation() - FVector(100.f, 0.0f, 0.0f);
+	FTransform Transform(Location);
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	APickUpBase* DropItem = Cast<APickUpBase>(GetWorld()->SpawnActor(DropItemClass, &Transform, SpawnParams));
+	if (DropItem)
+		DropItem->SetLifeSpan(5.0f);
+}
+
 // Called when the game starts or when spawned
 void AGrinchCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 }
+
+static float DistToDrop = 0.0f;
 
 // Called every frame
 void AGrinchCharacter::Tick(float DeltaTime)
@@ -41,6 +54,14 @@ void AGrinchCharacter::Tick(float DeltaTime)
 	}
 	else
 		ChangeLineTimer += DeltaTime;
+	
+	if (DistToDrop >= CoinDistanceDrop && !bShifting)
+	{
+		DistToDrop = 0.0f;
+		DropItem();
+	}
+	else
+		DistToDrop += GetCharacterMovement()->MaxWalkSpeed * DeltaTime;
 }
 
 void AGrinchCharacter::MoveForward()
@@ -110,7 +131,7 @@ void AGrinchCharacter::OffsetCharacterToLane()
 	}
 	else
 	{
-		// move 
+		// move
 		FVector Offset(0.0f, AxisY_Offset, 0.0f);
 		AddActorWorldOffset(Offset);
 
