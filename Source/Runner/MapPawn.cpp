@@ -4,6 +4,7 @@
 #include "RunnerGameInstance.h"
 #include "RunnerGameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "Containers/UnrealString.h"
 
 // Sets default values
 AMapPawn::AMapPawn()
@@ -24,18 +25,14 @@ void AMapPawn::BeginPlay()
 	{
 		for (const auto& tile : AllTiles)
 		{
-			if (tile.Type == ETileType::Default)
-				MapBasicTiles.Add(tile);
-			else if (tile.Type == ETileType::QTE)
-				MapQTETiles.Add(tile);
+			// push to std::map
+			MapsAllTiles.FindOrAdd(tile.Lanscape).Add(tile);
 		}
 	}
 
 	// create tiles at start
-	for (int8 i = 0; i < MapStartTileNum; ++i) 
-	{
-		CreateNewTile(true);
-	}
+	for (int8 i = 0; i < MapStartTileNum; ++i)
+		CreateNewTile();
 }
 
 // Called every frame
@@ -71,16 +68,35 @@ void AMapPawn::AddTileToMap(AMapPartBase* Tile)
 			MapTail->Next = NewNode;
 			MapTail = NewNode;
 		}
+
+		CurrentMapLength++;
 	}
 }
 
-void AMapPawn::CreateNewTile(bool bOnlyBasic)
+void AMapPawn::DeleteLastTile()
+{
+	if (MapHead->Next != MapHead)
+	{
+		Node* NewHead = MapHead->Next;
+
+		MapHead->Tile->DestroyTile();
+		MapHead = NewHead;
+
+		CurrentMapLength--;
+	}
+}
+
+void AMapPawn::CreateNewTile()
 {
 	// delete last before spawn new
-	if (CurrentMapLength >= MapMaxTileNum)
-	{
+	if (CurrentMapLength >= MapMaxTileRuntimeNum)
 		DeleteLastTile();
-	}
+
+	// determine tile type
+	TSubclassOf<AMapPartBase> TileClass;
+	ETileType Type = ETileType::None;
+
+	std::tie(Type, TileClass) = GetTileType();
 
 	// get new tile spawn location
 	FVector NewLocation = FVector(0.0f, 0.0f, 0.0f);
@@ -91,68 +107,111 @@ void AMapPawn::CreateNewTile(bool bOnlyBasic)
 		NewLocation = MapTail->Tile->ArrowEndLocComp->GetComponentTransform().GetLocation();
 		UE_LOG(LogTemp, Warning, TEXT("NewLocation is %s"), *NewLocation.ToString());
 	}
-		
 
+	// set spawn params
 	FTransform NewTransform(NewLocation);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	SpawnParams.Owner = this;
 
-	// determine tile type
-	TSubclassOf<AMapPartBase> TileClass;
-	ETileType Type = ETileType::None;
-
-	if (bOnlyBasic)
-	{
-		TileClass = MapBasicTiles[0].TileClass;
-		Type = ETileType::Default;
-	}
-	else
-	{
-		std::tie(Type, TileClass) = GetTileType();
-		UE_LOG(LogTemp, Warning, TEXT("CreateNewTile: Type is %s"), *UEnum::GetValueAsString(Type));
-	}
-		
-	// spawn
-	if (Type != ETileType::None)
+	// spawn in game
+	if ((Type != ETileType::None) && (CurrentEnv != ELandscapeType::None))
 	{
 		AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(TileClass, &NewTransform, SpawnParams));
+		//if (!bOnlyBasic && (Type == ETileType::Default))
+		SpawnObstacle(false, NewPart);
+
+		// update map info
 		AddTileToMap(NewPart);
-		CurrentMapLength++;
-
-		if (!bOnlyBasic && (Type == ETileType::Default))
-			SpawnObstacle(false, NewPart);
-
-	}		
+		PrevTileType = Type;
+	}
 }
 
-// TODO: expand logic for tile generator
+// determine type
 std::pair<ETileType, TSubclassOf<AMapPartBase>> AMapPawn::GetTileType()
 {
-	//int8 SeedForSpawn = FMath::RandRange(0, 100);
 	TSubclassOf<AMapPartBase> NewTileClass;
-	ETileType Type = ETileType::None;
+	ETileType NewType = ETileType::None;
 
-	//
-	if (FMath::RandRange(0, 100) < TileQTESpawnChance)
+	// spawn end tile for
+	if (bShouldChangeLocation)
 	{
-		// test
-		NewTileClass = MapQTETiles[0].TileClass;
-		Type = ETileType::QTE;
-		TileQTESpawnChance = 0;
+		NewType = ETileType::EndEnvTile;
+
+		// use current env until new timer tick
+		bShouldChangeLocation = false;
+
+		UE_LOG(LogTemp, Warning, TEXT("AMapPawn::GetTileType:  ChangeLocation"));
 	}
-	else
+	else if ((PrevTileType == ETileType::None) || (PrevTileType == ETileType::EndEnvTile))
 	{
-		// test
-		TileQTESpawnChance = (TileQTESpawnChance >= QTESpawnChance) ? 30 : (TileQTESpawnChance + 5);
-		
-		NewTileClass = MapBasicTiles[0].TileClass;
-		Type = ETileType::Default;
+		// determine env for new environment
+		CurrentEnv = GetNextEnvironment();
+
+		// set new tile as start of new location
+		NewType = ETileType::StartEnvTile;
+
+		// create timer for changing environment
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_ChangeLoc, FTimerDelegate::CreateLambda([&] { bShouldChangeLocation = true; }), TimeToChangeLocation, true);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("AMapPawn::GetTileType: [INfo] NewTyle - %s"), *UEnum::GetValueAsString(Type));
-	return std::make_pair(Type, NewTileClass);
+	else if ((PrevTileType != ETileType::None) || (PrevTileType == ETileType::BasicEnvTile))
+	{
+		// use basic
+		NewType = ETileType::BasicEnvTile;
+	}
+
+	// get tile class
+	TArray<FTileInfo> EnvTiles = MapsAllTiles.FindRef(CurrentEnv);
+	if (EnvTiles.Num() > 0)
+	{
+		TArray<FTileInfo> AvailableTiles;
+		for (const auto& tile : EnvTiles)
+		{
+			if (tile.Type == NewType)
+				AvailableTiles.Add(tile);
+		}
+
+		if (AvailableTiles.Num() > 0)
+			NewTileClass = AvailableTiles[FMath::RandRange(0, AvailableTiles.Num() - 1)].TileClass;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("AMapPawn::GetTileType: [INfo] NewTyle - %s, Env - %s"), *UEnum::GetValueAsString(NewType), *UEnum::GetValueAsString(CurrentEnv));
+	return std::make_pair(NewType, NewTileClass);
 }
 
+ELandscapeType AMapPawn::GetNextEnvironment()
+{
+	TArray<ELandscapeType> MapEnvs;
+	MapsAllTiles.GetKeys(MapEnvs);
+
+	if (MapEnvs.Num() == 0)
+		return ELandscapeType::None;
+
+	int8 i = 0;
+	bool bFind = false;
+	ELandscapeType NewEnv = ELandscapeType::None;
+	while (i < MapEnvs.Num() && !bFind)
+	{
+		if ((CurrentEnv == ELandscapeType::None) || (CurrentEnv == ELandscapeType::Village))
+			NewEnv = ELandscapeType::Forest;
+		else if (CurrentEnv == ELandscapeType::Forest)
+			NewEnv = ELandscapeType::Road;
+		else if (CurrentEnv == ELandscapeType::Road)
+			NewEnv = ELandscapeType::Village;
+
+		if (CheckIfEnvExist(NewEnv))
+			bFind = true;
+
+		i++;
+	}
+
+	return NewEnv;
+}
+
+bool AMapPawn::CheckIfEnvExist(ELandscapeType NewEnv)
+{
+	return MapsAllTiles.Contains(NewEnv);
+}
 
 void AMapPawn::SpawnObstacle(bool TwoObjects, AMapPartBase* MapTile)
 {
@@ -172,18 +231,5 @@ void AMapPawn::SpawnObstacle(bool TwoObjects, AMapPartBase* MapTile)
 	if (TwoObjects)
 	{
 		SpawnObstacle(false, MapTile);
-	}
-}
-
-void AMapPawn::DeleteLastTile()
-{
-	if (MapHead->Next != MapHead)
-	{
-		Node* NewHead = MapHead->Next;
-		
-		MapHead->Tile->DestroyTile();
-		MapHead = NewHead;
-
-		CurrentMapLength--;
 	}
 }

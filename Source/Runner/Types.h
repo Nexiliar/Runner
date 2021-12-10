@@ -9,11 +9,28 @@
 #include "Types.generated.h"
 
 UENUM(BlueprintType)
+enum class EMovementLine : uint8
+{
+	LINE_1,
+	LINE_2,
+	LINE_3
+};
+
+UENUM(BlueprintType)
+enum class ESpeedChangeTypes : uint8
+{
+	FirstType UMETA(DisplayName = "Increase Speed OverTime"),
+	SecondType UMETA(DisplayName = "Increase Speed Over Scores"),
+	ThirdType UMETA(DisplayName = "Increase Speed Over Certain Map Progress")
+};
+
+UENUM(BlueprintType)
 enum class ETileType : uint8
 {
 	None UMETA(DisplayName = "None"),
-	Default UMETA(DisplayName = "BasicTile"),
-	QTE UMETA(DisplayName = "QTE"),
+	StartEnvTile UMETA(DisplayName = "StartTile"),
+	BasicEnvTile UMETA(DisplayName = "BasicTile"),
+	EndEnvTile UMETA(DisplayName = "EndTile"),
 };
 
 UENUM(BlueprintType)
@@ -30,26 +47,25 @@ struct FTileInfo : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
 		ETileType Type = ETileType::None;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
 		ELandscapeType Lanscape = ELandscapeType::None;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
-		FName TileName = FName("Tile");
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
+	//	FName TileName = FName("Tile");
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
 		TSubclassOf<AMapPartBase> TileClass = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
-		FTransform Transform;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
+	//	FTransform Transform;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapTile")
 		float PassTileScore = 10.0f;
 };
 
 /**
- * 
+ *
  */
 UCLASS()
 class RUNNER_API UTypes : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-	
 };

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "MapPawn.h"
+#include "GrinchCharacter.h"
 #include "RunnerGameMode.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnScoresChange, int32, Scores);
@@ -23,9 +24,11 @@ public:
 
 	/** Editable in BP */
 
-	// Map 
+	// Map
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapSettings")
 		TSubclassOf<class AMapPawn> MapClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapSettings")
+		TSubclassOf<class AGrinchCharacter> GrinchClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapSettings")
 		float StartCharSpeed = 300.f;
 
@@ -44,6 +47,8 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable, Category = "MapPartSpawning")
 		void SpawnMapPart();
+	UFUNCTION(BlueprintCallable)
+		void SpawnBonus();
 
 	void ChangeScores(int32 Amount);
 
@@ -53,4 +58,5 @@ public:
 protected:
 	int32 CurrentPoints;
 	AMapPawn* GameMap = nullptr;
+	AGrinchCharacter* Grinch = nullptr;
 };

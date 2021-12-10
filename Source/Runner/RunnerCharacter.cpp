@@ -9,6 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GenericPlatform/GenericPlatformMath.h"
 #include "RunnerGameMode.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -77,7 +78,7 @@ void ARunnerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	CoordToRiseSpeed = GetActorLocation();
-	ChangeSpeed();
+	//ChangeSpeed();
 	if (isOverScores)
 	{
 		ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -102,10 +103,20 @@ void ARunnerCharacter::MoveForward(float Value)
 	}
 }
 
+void ARunnerCharacter::EnableInputsHandling()
+{
+	bKeysHandlingEnabled = true;
+}
+
+void ARunnerCharacter::DisableInputsHandling()
+{
+	bKeysHandlingEnabled = false;
+}
+
 void ARunnerCharacter::SwitchRoadLeft()
 {
-	if (CurrentLine != EMovementLine::LINE_1 && !bShifting) 
-	{		
+	if (CurrentLine != EMovementLine::LINE_1 && bKeysHandlingEnabled)
+	{
 		bShiftLeft = true;
 		CurrentLine = (CurrentLine == EMovementLine::LINE_3) ? EMovementLine::LINE_2 : EMovementLine::LINE_1;
 		ShiftDestinationPos = GetActorLocation() + FVector(0.0f, -LineOffset, 0.0f);
@@ -116,7 +127,7 @@ void ARunnerCharacter::SwitchRoadLeft()
 
 void ARunnerCharacter::SwitchRoadRight()
 {
-	if (CurrentLine != EMovementLine::LINE_3 && !bShifting)
+	if (CurrentLine != EMovementLine::LINE_3 && bKeysHandlingEnabled)
 	{
 		bShiftLeft = false;
 		CurrentLine = (CurrentLine == EMovementLine::LINE_1) ? EMovementLine::LINE_2 : EMovementLine::LINE_3;
@@ -129,17 +140,23 @@ void ARunnerCharacter::SwitchRoadRight()
 void ARunnerCharacter::StartShiftingLine()
 {
 	// block input
-	bShifting = true;
+	DisableInputsHandling();
 
 	// play montage
 	if (ShiftMontage)
 	{
 		ShiftMontagePlayTime = ShiftMontage->GetPlayLength();
 		PlayAnimMontage(ShiftMontage, ShiftMontagePlaySpeed);
+		TimeToShift = ShiftMontagePlayTime / ShiftMontagePlaySpeed;
 	}
+	else
+		TimeToShift = 0.2f;
+
+	AxisY_Offset = (ShiftOffsetAnimTimeRate * LineOffset) / TimeToShift;
+	if (bShiftLeft)
+		AxisY_Offset *= -1;
 
 	// start timer
-	TimeToShift = ShiftMontagePlayTime / ShiftMontagePlaySpeed;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_SwitchLine, this, &ARunnerCharacter::OffsetCharacterToLane, ShiftOffsetAnimTimeRate, true);
 }
 
@@ -149,30 +166,25 @@ void ARunnerCharacter::OffsetCharacterToLane()
 	{
 		// ClearTimer
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle_SwitchLine);
-		
+
 		// Correct Position
 		if (ShiftMontage)
 			GetCapsuleComponent()->AddWorldOffset(FVector(0.0f, ShiftDestinationPos.Y - GetActorLocation().Y, 0.0f));
-		
+
 		// unblock input
-		bShifting = false;
+		EnableInputsHandling();
 	}
 	else
 	{
-		TimeToShift -= ShiftOffsetAnimTimeRate;
-
-		float AxisX_Offset = GetCharacterMovement()->GetMaxSpeed() * ShiftOffsetAnimTimeRate;
-		float AxisY_Offset = (ShiftOffsetAnimTimeRate * LineOffset) / (ShiftMontagePlayTime / ShiftMontagePlaySpeed);
-
-		if (bShiftLeft)
-			AxisY_Offset *= -1;
-
-		FVector Offset(AxisX_Offset, AxisY_Offset, 0.0f);
+		// move
+		FVector Offset(0.0f, AxisY_Offset, 0.0f);
 		AddActorWorldOffset(Offset);
-	}	
+
+		TimeToShift -= ShiftOffsetAnimTimeRate;
+	}
 }
 
-//Trace to checkout is there is an obstacle
+//Trace to checkout is there is an obstacle TODO!!!
 bool ARunnerCharacter::CanSwitchLane(bool SwitchSide)
 {
 	bool Hit;
@@ -251,7 +263,7 @@ void ARunnerCharacter::OverProgress()
 	}
 }
 
-bool ARunnerCharacter::DeadEvent()
+bool ARunnerCharacter::KillChar()
 {
 	if (GetMesh())
 	{
