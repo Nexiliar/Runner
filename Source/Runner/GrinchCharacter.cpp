@@ -29,7 +29,7 @@ void AGrinchCharacter::DropItem()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	APickUpBase* DropItem = Cast<APickUpBase>(GetWorld()->SpawnActor(DropItemClass, &Transform, SpawnParams));
 	if (DropItem)
-		DropItem->SetLifeSpan(5.0f);
+		DropItem->SetLifeSpan(10.0f);
 }
 
 // Called when the game starts or when spawned
