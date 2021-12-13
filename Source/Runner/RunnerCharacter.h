@@ -20,6 +20,10 @@ class ARunnerCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* FollowCamera;
 
+	/* Collsion box for line switching */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
+		class UBoxComponent* BoxComponent = nullptr;
+
 public:
 	ARunnerCharacter();
 
@@ -99,7 +103,9 @@ public:
 	void SwitchRoadLeft();
 	void SwitchRoadRight();
 	void OffsetCharacterToLane();
-	bool CanSwitchLane(bool SwitchSide);
+
+	UFUNCTION()
+		void CheckForCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	//SpeedChangeFunctions
 	void ChangeSpeed();
@@ -118,7 +124,9 @@ protected:
 
 	//Check whether its left or right lane
 	bool bShiftLeft = false;
+	bool bShifting = false;
 	FVector ShiftDestinationPos = FVector(0.0f, 0.0f, 0.0f);
+	FVector ShiftStartPos = FVector(0.0f, 0.0f, 0.0f);
 	float LineOffset = 300.f;
 	float TimeToShift = 0.2f;
 	float ShiftMontagePlayTime = 1.0f;

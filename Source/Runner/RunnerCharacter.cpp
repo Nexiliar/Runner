@@ -10,7 +10,9 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GenericPlatform/GenericPlatformMath.h"
+#include "Runtime/Engine/Classes/Components/BoxComponent.h"
 #include "RunnerGameMode.h"
+#include "ObstacleBase.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ARunnerCharacter
@@ -51,6 +53,10 @@ ARunnerCharacter::ARunnerCharacter()
 	//Create arrow comp for obstacle check coord
 	CheckComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ObstaclesCheck"));
 	CheckComponent->SetupAttachment(RootComponent);
+
+	// Create collision box for line switching
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("SwitchBox"));
+	BoxComponent->SetupAttachment(RootComponent);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -87,6 +93,8 @@ void ARunnerCharacter::BeginPlay()
 			Gamemode->OnScoresChange.AddDynamic(this, &ARunnerCharacter::OverScores);
 		}
 	}
+
+	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &ARunnerCharacter::CheckForCollision);
 }
 
 void ARunnerCharacter::MoveForward(float Value)
@@ -118,8 +126,9 @@ void ARunnerCharacter::SwitchRoadLeft()
 	if (CurrentLine != EMovementLine::LINE_1 && bKeysHandlingEnabled)
 	{
 		bShiftLeft = true;
-		CurrentLine = (CurrentLine == EMovementLine::LINE_3) ? EMovementLine::LINE_2 : EMovementLine::LINE_1;
-		ShiftDestinationPos = GetActorLocation() + FVector(0.0f, -LineOffset, 0.0f);
+		DestinationLine = (CurrentLine == EMovementLine::LINE_3) ? EMovementLine::LINE_2 : EMovementLine::LINE_1;
+		ShiftStartPos = GetActorLocation();
+		ShiftDestinationPos = ShiftStartPos + FVector(0.0f, -LineOffset, 0.0f);
 		//UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::SwitchRoadLeft:  Location - %s, Destination - %s"), *GetActorLocation().ToString(), *ShiftDestinationPos.ToString());
 		StartShiftingLine();
 	}
@@ -130,8 +139,9 @@ void ARunnerCharacter::SwitchRoadRight()
 	if (CurrentLine != EMovementLine::LINE_3 && bKeysHandlingEnabled)
 	{
 		bShiftLeft = false;
-		CurrentLine = (CurrentLine == EMovementLine::LINE_1) ? EMovementLine::LINE_2 : EMovementLine::LINE_3;
-		ShiftDestinationPos = GetActorLocation() + FVector(0.0f, LineOffset, 0.0f);
+		DestinationLine = (CurrentLine == EMovementLine::LINE_1) ? EMovementLine::LINE_2 : EMovementLine::LINE_3;
+		ShiftStartPos = GetActorLocation();
+		ShiftDestinationPos = ShiftStartPos + FVector(0.0f, LineOffset, 0.0f);
 		//UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::SwitchRoadRight:  Location - %s, Destination - %s"), *GetActorLocation().ToString(), *ShiftDestinationPos.ToString());
 		StartShiftingLine();
 	}
@@ -141,6 +151,8 @@ void ARunnerCharacter::StartShiftingLine()
 {
 	// block input
 	DisableInputsHandling();
+
+	bShifting = true;
 
 	// play montage
 	if (ShiftMontage)
@@ -173,6 +185,9 @@ void ARunnerCharacter::OffsetCharacterToLane()
 
 		// unblock input
 		EnableInputsHandling();
+
+		bShifting = false;
+		CurrentLine = DestinationLine;
 	}
 	else
 	{
@@ -185,29 +200,22 @@ void ARunnerCharacter::OffsetCharacterToLane()
 }
 
 //Trace to checkout is there is an obstacle TODO!!!
-bool ARunnerCharacter::CanSwitchLane(bool SwitchSide)
+void ARunnerCharacter::CheckForCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	bool Hit;
-	FVector SpawnLocation = CheckComponent->GetComponentLocation();
-	FHitResult HitResult;
-	FVector RightVector = CheckComponent->GetRightVector();
-	if (!SwitchSide)
+	UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::CheckForCollision - Actor: %s"), *OtherActor->GetName());
+	if (bShifting)
 	{
-		RightVector = RightVector * (-1.0f);
+		UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::CheckForCollision - bShifting: %s"), *OtherActor->GetName());
+		if (Cast<AObstacleBase>(OtherActor))
+		{
+			// ClearTimer
+			GetWorld()->GetTimerManager().ClearTimer(TimerHandle_SwitchLine);
+			float CurX = GetActorLocation().X;
+
+			SetActorLocation(FVector(CurX, ShiftStartPos.Y, ShiftStartPos.Z));
+		}
+		
 	}
-	RightVector = RightVector * 500 + SpawnLocation;
-	Hit = GetWorld()->LineTraceSingleByChannel(HitResult, SpawnLocation, RightVector, ECollisionChannel::ECC_Visibility);
-	if (!Hit)
-	{
-		FVector EndUpLocation(60.0f, 0.0f, 0.0f);
-		SpawnLocation -= EndUpLocation;
-		Hit = GetWorld()->LineTraceSingleByChannel(HitResult, SpawnLocation, RightVector, ECollisionChannel::ECC_Visibility);
-		if (Debug)
-			DrawDebugLine(GetWorld(), SpawnLocation, RightVector, FColor::Green, false, 50.0f);
-	}
-	if (Debug)
-		DrawDebugLine(GetWorld(), SpawnLocation, RightVector, FColor::Blue, false, 50.0f);
-	return Hit;
 }
 
 //Simple ChangeSpeedFunc

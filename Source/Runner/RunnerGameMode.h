@@ -50,7 +50,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void SpawnBonus();
 
-	void ChangeScores(int32 Amount);
+	UFUNCTION(BlueprintCallable)
+		void ChangeScores(int32 Amount);
 
 	UFUNCTION(BlueprintCallable, Category = "Points")
 		int32 GetCurrentScores();

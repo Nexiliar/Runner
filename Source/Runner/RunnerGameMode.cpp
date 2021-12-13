@@ -41,6 +41,7 @@ void ARunnerGameMode::ChangeScores(int32 Amount)
 {
 	CurrentPoints += Amount;
 	OnScoresChange.Broadcast(CurrentPoints);
+	UE_LOG(LogTemp, Warning, TEXT("ARunnerGameMode::ChangeScores  CurrentPoints %i"), CurrentPoints);
 }
 
 int32 ARunnerGameMode::GetCurrentScores()
