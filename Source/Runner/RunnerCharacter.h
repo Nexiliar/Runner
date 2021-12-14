@@ -100,7 +100,9 @@ public:
 		void DisableInputsHandling();
 
 	//SwitchLaneFunctions
+	UFUNCTION(BlueprintCallable)
 	void SwitchRoadLeft();
+	UFUNCTION(BlueprintCallable)
 	void SwitchRoadRight();
 	void OffsetCharacterToLane();
 
