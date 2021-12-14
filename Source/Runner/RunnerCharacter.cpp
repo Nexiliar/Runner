@@ -84,7 +84,7 @@ void ARunnerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	CoordToRiseSpeed = GetActorLocation();
-	//ChangeSpeed();
+	ChangeSpeed();
 	if (isOverScores)
 	{
 		ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
