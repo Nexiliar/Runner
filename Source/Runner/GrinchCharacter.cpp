@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PickUpBase.h"
+#include "RunnerGameMode.h"
 
 // Sets default values
 AGrinchCharacter::AGrinchCharacter()
@@ -27,7 +28,28 @@ void AGrinchCharacter::DropItem()
 	FTransform Transform(Location);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	APickUpBase* DropItem = Cast<APickUpBase>(GetWorld()->SpawnActor(DropItemClass, &Transform, SpawnParams));
+
+	// determine drop item
+	APickUpBase* DropItem = nullptr;
+	int32 RandSeed = FMath::RandRange(0, 100);
+	if (RandSeed % 6 == 0)
+	{
+		// spawn buff
+		if (DropBufsClass.Num() > 0)
+			DropItem = Cast<APickUpBase>(GetWorld()->SpawnActor(DropBufsClass[0], &Transform, SpawnParams));
+	}
+	else if (RandSeed % 5 == 0)
+	{
+		// spawn debuff
+		if (DropDebufsClass.Num() > 0)
+			DropItem = Cast<APickUpBase>(GetWorld()->SpawnActor(DropDebufsClass[0], &Transform, SpawnParams));
+	}
+	else
+	{
+		// spawn coin
+		DropItem = Cast<APickUpBase>(GetWorld()->SpawnActor(DropCoinClass, &Transform, SpawnParams));
+	}
+
 	if (DropItem)
 		DropItem->SetLifeSpan(20.0f);
 }
@@ -36,6 +58,13 @@ void AGrinchCharacter::DropItem()
 void AGrinchCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (Gamemode)
+	{
+		MaxMoveSpeed = Gamemode->MaxCharSpeed;
+		MinMoveSpeed = Gamemode->StartCharSpeed;
+	}
 }
 
 static float DistToDrop = 0.0f;
@@ -62,6 +91,19 @@ void AGrinchCharacter::Tick(float DeltaTime)
 	}
 	else
 		DistToDrop += GetCharacterMovement()->MaxWalkSpeed * DeltaTime;
+}
+
+void AGrinchCharacter::SetCharSpeed(float NewSpeed)
+{
+	if (NewSpeed >= MinMoveSpeed && NewSpeed <= MaxMoveSpeed)
+		GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
+
+	UE_LOG(LogTemp, Warning, TEXT("AGrinchCharacter::SetCharSpeed - NewSpeed: %f"), GetCharSpeed());
+}
+
+float AGrinchCharacter::GetCharSpeed() const
+{
+	return GetCharacterMovement()->MaxWalkSpeed;
 }
 
 void AGrinchCharacter::MoveForward()

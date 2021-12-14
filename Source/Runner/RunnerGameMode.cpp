@@ -29,6 +29,7 @@ void ARunnerGameMode::BeginPlay()
 void ARunnerGameMode::SpawnMapPart()
 {
 	GameMap->CreateNewTile();
+	//Grinch->SetCharSpeed(Grinch->GetCharSpeed() + 200.f);
 }
 
 void ARunnerGameMode::SpawnBonus()
@@ -40,8 +41,8 @@ void ARunnerGameMode::SpawnBonus()
 void ARunnerGameMode::ChangeScores(int32 Amount)
 {
 	CurrentPoints += Amount;
-	OnScoresChange.Broadcast(CurrentPoints);
-	//UE_LOG(LogTemp, Warning, TEXT("ARunnerGameMode::ChangeScores  CurrentPoints %i"), CurrentPoints);
+	OnScoresChange.Broadcast(Amount);
+	UE_LOG(LogTemp, Warning, TEXT("ARunnerGameMode::ChangeScores  CurrentPoints %i"), CurrentPoints);
 }
 
 int32 ARunnerGameMode::GetCurrentScores()
