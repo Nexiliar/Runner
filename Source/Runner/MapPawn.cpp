@@ -105,7 +105,7 @@ void AMapPawn::CreateNewTile()
 	else
 	{
 		NewLocation = MapTail->Tile->ArrowEndLocComp->GetComponentTransform().GetLocation();
-		UE_LOG(LogTemp, Warning, TEXT("NewLocation is %s"), *NewLocation.ToString());
+		//UE_LOG(LogTemp, Warning, TEXT("NewLocation is %s"), *NewLocation.ToString());
 	}
 
 	// set spawn params
@@ -119,7 +119,7 @@ void AMapPawn::CreateNewTile()
 	{
 		AMapPartBase* NewPart = Cast<AMapPartBase>(GetWorld()->SpawnActor(TileClass, &NewTransform, SpawnParams));
 		//if (!bOnlyBasic && (Type == ETileType::Default))
-		SpawnObstacle(false, NewPart);
+		//SpawnObstacle(false, NewPart);
 
 		// update map info
 		AddTileToMap(NewPart);
@@ -133,7 +133,7 @@ std::pair<ETileType, TSubclassOf<AMapPartBase>> AMapPawn::GetTileType()
 	TSubclassOf<AMapPartBase> NewTileClass;
 	ETileType NewType = ETileType::None;
 
-	// spawn end tile for
+	// spawn end tile for current location
 	if (bShouldChangeLocation)
 	{
 		NewType = ETileType::EndEnvTile;
@@ -152,7 +152,7 @@ std::pair<ETileType, TSubclassOf<AMapPartBase>> AMapPawn::GetTileType()
 		NewType = ETileType::StartEnvTile;
 
 		// create timer for changing environment
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_ChangeLoc, FTimerDelegate::CreateLambda([&] { bShouldChangeLocation = true; }), TimeToChangeLocation, true);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_ChangeLoc, FTimerDelegate::CreateLambda([&] { bShouldChangeLocation = true; }), TimeToChangeLocation, false);
 	}
 	else if ((PrevTileType != ETileType::None) || (PrevTileType == ETileType::BasicEnvTile))
 	{

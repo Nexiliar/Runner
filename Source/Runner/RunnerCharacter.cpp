@@ -202,7 +202,6 @@ void ARunnerCharacter::OffsetCharacterToLane()
 //Trace to checkout is there is an obstacle TODO!!!
 void ARunnerCharacter::CheckForCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::CheckForCollision - Actor: %s"), *OtherActor->GetName());
 	if (bShifting)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::CheckForCollision - bShifting: %s"), *OtherActor->GetName());
