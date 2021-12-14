@@ -6,6 +6,14 @@
 #include "GameFramework/Actor.h"
 #include "PickUpBase.generated.h"
 
+UENUM(BlueprintType)
+enum class EDropItem : uint8
+{
+	COIN,
+	BUFF,
+	DEBUFF
+};
+
 UCLASS()
 class RUNNER_API APickUpBase : public AActor
 {
@@ -30,12 +38,17 @@ public:
 	UFUNCTION()
 		void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	EDropItem GetType() const;
+
+public:
 	//PickUp object Name
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickUpSettings")
 		FString ObjectName;
 	//Sound to play when pick up
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickUpSettings")
 		USoundBase* PickUpSound = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickUpSettings")
+		EDropItem PickUpType = EDropItem::COIN;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "20000", UIMin = "0", UIMax = "20000"), Category = "PickUpSettings")
 		int32 AmountOfScoresGainOnPickUp = 0;

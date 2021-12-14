@@ -35,12 +35,32 @@ void APickUpBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 	ARunnerCharacter* Char = Cast<ARunnerCharacter>(OtherActor);
 	if (Char)
 	{
-		ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-		if (Gamemode)
+		switch (PickUpType)
 		{
-			Gamemode->ChangeScores(AmountOfScoresGainOnPickUp);
-			UGameplayStatics::PlaySound2D(GetWorld(), PickUpSound);
-			Destroy();
+		case EDropItem::COIN: default:
+		{
+			ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+			if (Gamemode)
+				Gamemode->ChangeScores(AmountOfScoresGainOnPickUp);
+
+			break;
 		}
+		case EDropItem::BUFF:
+		{
+			Char->SetCharSpeed(Char->GetCharSpeed() + AmountOfScoresGainOnPickUp);
+			break;
+		}
+		case EDropItem::DEBUFF:
+			Char->SetCharSpeed(Char->GetCharSpeed() - AmountOfScoresGainOnPickUp);
+			break;
+		}
+
+		UGameplayStatics::PlaySound2D(GetWorld(), PickUpSound);
+		Destroy();
 	}
+}
+
+EDropItem APickUpBase::GetType() const
+{
+	return PickUpType;
 }

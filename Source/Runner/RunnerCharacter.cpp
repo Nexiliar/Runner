@@ -121,6 +121,21 @@ void ARunnerCharacter::DisableInputsHandling()
 	bKeysHandlingEnabled = false;
 }
 
+void ARunnerCharacter::SetCharSpeed(float NewSpeed)
+{
+	ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (Gamemode && (NewSpeed <= Gamemode->MaxCharSpeed) && (NewSpeed >= Gamemode->StartCharSpeed))
+	{
+		GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
+		UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::SetCharSpeed - NewSpeed: %f"), NewSpeed);
+	}
+}
+
+float ARunnerCharacter::GetCharSpeed() const
+{
+	return GetCharacterMovement()->MaxWalkSpeed;
+}
+
 void ARunnerCharacter::SwitchRoadLeft()
 {
 	if (CurrentLine != EMovementLine::LINE_1 && bKeysHandlingEnabled)
@@ -212,8 +227,9 @@ void ARunnerCharacter::CheckForCollision(UPrimitiveComponent* OverlappedComponen
 			float CurX = GetActorLocation().X;
 
 			SetActorLocation(FVector(CurX, ShiftStartPos.Y, ShiftStartPos.Z));
+
+			SetCharSpeed(GetCharSpeed() - 100.f);
 		}
-		
 	}
 }
 
@@ -244,17 +260,20 @@ void ARunnerCharacter::OverTime()
 		UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::OverTime"));
 }
 
+static int32 CurrScoreToRiseUp = 0;
+
 //ChangeSpeed OverScores
 void ARunnerCharacter::OverScores(int32 Scores)
 {
-	int32 TempScores = AmountOfScoresToRiseUpSpeed - Scores;
-	if (TempScores <= 0)
+	//UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::OverScores - CurrScoreToRiseUp %i"), CurrScoreToRiseUp);
+
+	if (CurrScoreToRiseUp >= AmountOfScoresToRiseUpSpeed)
 	{
-		AmountOfScoresToRiseUpSpeed += Scores;
-		GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
+		SetCharSpeed(GetCharSpeed() + 50.0f);
+		CurrScoreToRiseUp = 0;
 	}
-	if (Debug)
-		UE_LOG(LogTemp, Warning, TEXT("CurrentAmountOfScores = %d"), AmountOfScoresToRiseUpSpeed);
+	else
+		CurrScoreToRiseUp += Scores;
 }
 
 //ChangeSpeed OverMapProgress

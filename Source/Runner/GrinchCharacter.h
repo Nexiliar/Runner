@@ -15,7 +15,11 @@ class RUNNER_API AGrinchCharacter : public ACharacter
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
-		TSubclassOf<class APickUpBase> DropItemClass;
+		TSubclassOf<class APickUpBase> DropCoinClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+		TArray<TSubclassOf<class APickUpBase>> DropBufsClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+		TArray<TSubclassOf<class APickUpBase>> DropDebufsClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 		float CoinDistanceDrop = 300.0f;
 
@@ -44,7 +48,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Char Speed Buf/Debuf
+	UFUNCTION(BlueprintCallable)
+		void SetCharSpeed(float NewSpeed);
+	UFUNCTION(BlueprintCallable)
+		float GetCharSpeed() const;
+
 protected:
+
+	float MaxMoveSpeed = 1500.f;
+	float MinMoveSpeed = 300.f;
 
 	//SwitchLaneVariables
 	EMovementLine CurrentLine = EMovementLine::LINE_2;

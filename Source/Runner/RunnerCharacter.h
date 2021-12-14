@@ -7,6 +7,7 @@
 #include "Types.h"
 #include "RunnerCharacter.generated.h"
 
+
 UCLASS(config = Game)
 class ARunnerCharacter : public ACharacter
 {
@@ -98,6 +99,13 @@ public:
 		void EnableInputsHandling();
 	UFUNCTION(BlueprintCallable)
 		void DisableInputsHandling();
+
+	// Char Speed Buf/Debuf
+	UFUNCTION(BlueprintCallable)
+		void SetCharSpeed(float NewSpeed);
+	UFUNCTION(BlueprintCallable)
+		float GetCharSpeed() const;
+
 
 	//SwitchLaneFunctions
 	void SwitchRoadLeft();
