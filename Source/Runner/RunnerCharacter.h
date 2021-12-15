@@ -23,7 +23,9 @@ class ARunnerCharacter : public ACharacter
 
 	/* Collsion box for line switching */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
-		class UBoxComponent* BoxComponent = nullptr;
+		class UBoxComponent* LeftShiftBox = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
+		class UBoxComponent* RightShiftBox = nullptr;
 
 public:
 	ARunnerCharacter();
@@ -104,14 +106,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void SetCharSpeed(float NewSpeed);
 	UFUNCTION(BlueprintCallable)
+		void ChangeSpeedByFactor(float MulFactor);
+	UFUNCTION(BlueprintCallable)
+		void ChangeSpeedByBuff(float MulFactor);
+	UFUNCTION(BlueprintCallable)
 		float GetCharSpeed() const;
 
 
 	//SwitchLaneFunctions
 	UFUNCTION(BlueprintCallable)
-	void SwitchRoadLeft();
+		void SwitchRoadLeft();
 	UFUNCTION(BlueprintCallable)
-	void SwitchRoadRight();
+		void SwitchRoadRight();
 	void OffsetCharacterToLane();
 
 	UFUNCTION()
@@ -132,6 +138,8 @@ public:
 
 protected:
 
+	float SpeedBeforeBuff = 100.f;
+
 	//Check whether its left or right lane
 	bool bShiftLeft = false;
 	bool bShifting = false;
@@ -151,4 +159,8 @@ protected:
 
 	bool isOverScores = false;
 	FVector CoordToRiseSpeed;
+
+	bool bUnderBuffEffect = false;
+	bool bUnderDebuffEffect = false;
+
 };

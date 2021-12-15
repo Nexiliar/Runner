@@ -31,14 +31,14 @@ void AGrinchCharacter::DropItem()
 
 	// determine drop item
 	APickUpBase* DropItem = nullptr;
-	int32 RandSeed = FMath::RandRange(0, 100);
-	if (RandSeed % 6 == 0)
+	int32 RandSeed = FMath::RandRange(0, 1000);
+	if (RandSeed % 40 == 0)
 	{
 		// spawn buff
 		if (DropBufsClass.Num() > 0)
 			DropItem = Cast<APickUpBase>(GetWorld()->SpawnActor(DropBufsClass[0], &Transform, SpawnParams));
 	}
-	else if (RandSeed % 5 == 0)
+	else if (RandSeed % 33 == 0)
 	{
 		// spawn debuff
 		if (DropDebufsClass.Num() > 0)

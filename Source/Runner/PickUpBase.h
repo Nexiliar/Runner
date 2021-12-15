@@ -52,4 +52,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "20000", UIMin = "0", UIMax = "20000"), Category = "PickUpSettings")
 		int32 AmountOfScoresGainOnPickUp = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickUpSettings")
+		float SpeedMultiply = 1.0;
 };

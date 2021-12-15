@@ -55,8 +55,10 @@ ARunnerCharacter::ARunnerCharacter()
 	CheckComponent->SetupAttachment(RootComponent);
 
 	// Create collision box for line switching
-	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("SwitchBox"));
-	BoxComponent->SetupAttachment(RootComponent);
+	LeftShiftBox = CreateDefaultSubobject<UBoxComponent>(TEXT("SwitchBox_1"));
+	LeftShiftBox->SetupAttachment(RootComponent);
+	RightShiftBox = CreateDefaultSubobject<UBoxComponent>(TEXT("SwitchBox_2"));
+	RightShiftBox->SetupAttachment(RootComponent);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -66,10 +68,8 @@ void ARunnerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 {
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	//PlayerInputComponent->BindAction("SwitchRoadRight", IE_Pressed, this, &ARunnerCharacter::SwitchRoadRight);
-	//PlayerInputComponent->BindAction("SwitchRoadLeft", IE_Pressed, this, &ARunnerCharacter::SwitchRoadLeft);
+	PlayerInputComponent->BindAction("SwitchRoadRight", IE_Pressed, this, &ARunnerCharacter::SwitchRoadRight);
+	PlayerInputComponent->BindAction("SwitchRoadLeft", IE_Pressed, this, &ARunnerCharacter::SwitchRoadLeft);
 }
 
 void ARunnerCharacter::Tick(float DeltaSeconds)
@@ -90,11 +90,13 @@ void ARunnerCharacter::BeginPlay()
 		ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (Gamemode)
 		{
-			Gamemode->OnScoresChange.AddDynamic(this, &ARunnerCharacter::OverScores);
+			//Gamemode->OnScoresChange.AddDynamic(this, &ARunnerCharacter::OverScores);
 		}
 	}
 
-	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &ARunnerCharacter::CheckForCollision);
+	LeftShiftBox->OnComponentBeginOverlap.AddDynamic(this, &ARunnerCharacter::CheckForCollision);
+	RightShiftBox->OnComponentBeginOverlap.AddDynamic(this, &ARunnerCharacter::CheckForCollision);
+
 }
 
 void ARunnerCharacter::MoveForward(float Value)
@@ -123,13 +125,41 @@ void ARunnerCharacter::DisableInputsHandling()
 
 void ARunnerCharacter::SetCharSpeed(float NewSpeed)
 {
+	if (!GetWorld())
+		return;
+
 	ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (Gamemode && (NewSpeed <= Gamemode->MaxCharSpeed) && (NewSpeed >= Gamemode->StartCharSpeed))
+	if (Gamemode && (NewSpeed <= Gamemode->MaxCharSpeed) && (NewSpeed >= Gamemode->MinCharSpeed))
 	{
 		GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
 		UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::SetCharSpeed - NewSpeed: %f"), NewSpeed);
 	}
 }
+
+void ARunnerCharacter::ChangeSpeedByFactor(float MulFactor)
+{
+	SetCharSpeed(GetCharacterMovement()->MaxWalkSpeed * MulFactor);
+}
+
+void ARunnerCharacter::ChangeSpeedByBuff(float MulFactor)
+{
+	
+	if (bUnderBuffEffect)
+	{
+		GetWorldTimerManager().ClearTimer(TimerHandle_SpeedRise);
+		SetCharSpeed(SpeedBeforeBuff * MulFactor);
+	}
+	else
+	{
+		SpeedBeforeBuff = GetCharSpeed();
+		SetCharSpeed(SpeedBeforeBuff * MulFactor);
+		bUnderBuffEffect = true;
+	}
+	
+	// end buf/debuff
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpeedRise, FTimerDelegate::CreateLambda([&] { SetCharSpeed(SpeedBeforeBuff); bUnderBuffEffect = false; }), 5.0f, false);
+}
+
 
 float ARunnerCharacter::GetCharSpeed() const
 {
@@ -229,6 +259,9 @@ void ARunnerCharacter::CheckForCollision(UPrimitiveComponent* OverlappedComponen
 			SetActorLocation(FVector(CurX, ShiftStartPos.Y, ShiftStartPos.Z));
 
 			SetCharSpeed(GetCharSpeed() - 100.f);
+
+			// unblock input
+			EnableInputsHandling();
 		}
 	}
 }
@@ -291,6 +324,10 @@ void ARunnerCharacter::OverProgress()
 
 bool ARunnerCharacter::KillChar()
 {
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_SpeedRise);
+	GetWorldTimerManager().ClearTimer(TimerHandle_SwitchLine);
+
 	if (GetMesh())
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 0.0f;

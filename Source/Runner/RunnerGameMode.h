@@ -30,9 +30,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapSettings")
 		TSubclassOf<class AGrinchCharacter> GrinchClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapSettings")
-		float StartCharSpeed = 600.f;
+		float StartCharSpeed = 800.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapSettings")
 		float MaxCharSpeed = 1500.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapSettings")
+		float MinCharSpeed = 600.f;
 
 	//PickUp Classess to randomly spawn on tile
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")
