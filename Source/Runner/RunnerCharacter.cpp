@@ -83,20 +83,15 @@ void ARunnerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CoordToRiseSpeed = GetActorLocation();
-	ChangeSpeed();
-	if (isOverScores)
-	{
-		ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-		if (Gamemode)
-		{
-			//Gamemode->OnScoresChange.AddDynamic(this, &ARunnerCharacter::OverScores);
-		}
-	}
-
 	LeftShiftBox->OnComponentBeginOverlap.AddDynamic(this, &ARunnerCharacter::CheckForCollision);
 	RightShiftBox->OnComponentBeginOverlap.AddDynamic(this, &ARunnerCharacter::CheckForCollision);
 
+	ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (Gamemode)
+	{
+		SpeedMinVal = Gamemode->MinCharSpeed;
+		SpeedMaxVal = Gamemode->MaxCharSpeed;
+	}
 }
 
 void ARunnerCharacter::MoveForward(float Value)
@@ -125,14 +120,12 @@ void ARunnerCharacter::DisableInputsHandling()
 
 void ARunnerCharacter::SetCharSpeed(float NewSpeed)
 {
-	if (!GetWorld())
-		return;
-
-	ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (Gamemode && (NewSpeed <= Gamemode->MaxCharSpeed) && (NewSpeed >= Gamemode->MinCharSpeed))
+	if ((NewSpeed <= SpeedMaxVal) && (NewSpeed >= SpeedMinVal))
 	{
 		GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
 		UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::SetCharSpeed - NewSpeed: %f"), NewSpeed);
+
+		ChangeAnimPlayRate();
 	}
 }
 
@@ -144,26 +137,40 @@ void ARunnerCharacter::ChangeSpeedByFactor(float MulFactor)
 void ARunnerCharacter::ChangeSpeedByBuff(float MulFactor)
 {
 	
-	if (bUnderBuffEffect)
+	if (bSpeedUnderEffect)
 	{
+		// clear prev buff/debuff
 		GetWorldTimerManager().ClearTimer(TimerHandle_SpeedRise);
-		SetCharSpeed(SpeedBeforeBuff * MulFactor);
 	}
 	else
 	{
 		SpeedBeforeBuff = GetCharSpeed();
-		SetCharSpeed(SpeedBeforeBuff * MulFactor);
-		bUnderBuffEffect = true;
+		bSpeedUnderEffect = true;
 	}
 	
-	// end buf/debuff
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpeedRise, FTimerDelegate::CreateLambda([&] { SetCharSpeed(SpeedBeforeBuff); bUnderBuffEffect = false; }), 5.0f, false);
+	float TempSpeed = SpeedBeforeBuff * MulFactor;
+	// skip buff/debuff if speed out of range
+	if ((TempSpeed > SpeedMinVal) && (TempSpeed < SpeedMaxVal))
+	{
+		SetCharSpeed(TempSpeed);
+		// end buf/debuff
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpeedRise, FTimerDelegate::CreateLambda([&] { SetCharSpeed(GetCharSpeed()); bSpeedUnderEffect = false; }), 5.0f, false);
+
+		// TODO 
+		// broadcast to widget
+	}
+	
 }
 
 
 float ARunnerCharacter::GetCharSpeed() const
 {
 	return GetCharacterMovement()->MaxWalkSpeed;
+}
+
+float ARunnerCharacter::GetCharSpeedMinValue() const
+{
+	return SpeedMinVal;
 }
 
 void ARunnerCharacter::SwitchRoadLeft()
@@ -262,63 +269,9 @@ void ARunnerCharacter::CheckForCollision(UPrimitiveComponent* OverlappedComponen
 
 			// unblock input
 			EnableInputsHandling();
+
+			ChangeAnimPlayRate();
 		}
-	}
-}
-
-//Simple ChangeSpeedFunc
-void ARunnerCharacter::ChangeSpeed()
-{
-	switch (SpeedChangeTypes)
-	{
-	case ESpeedChangeTypes::FirstType:
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpeedRise, this, &ARunnerCharacter::OverTime, TimeUntillSpeedUp, true);
-		break;
-	case ESpeedChangeTypes::SecondType:
-		isOverScores = true;
-		break;
-	case ESpeedChangeTypes::ThirdType:
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpeedRise, this, &ARunnerCharacter::OverProgress, 0.5f, true);
-		break;
-	default:
-		break;
-	}
-}
-
-//ChangeSpeed OverTime
-void ARunnerCharacter::OverTime()
-{
-	GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
-	if (Debug)
-		UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::OverTime"));
-}
-
-static int32 CurrScoreToRiseUp = 0;
-
-//ChangeSpeed OverScores
-void ARunnerCharacter::OverScores(int32 Scores)
-{
-	//UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::OverScores - CurrScoreToRiseUp %i"), CurrScoreToRiseUp);
-
-	if (CurrScoreToRiseUp >= AmountOfScoresToRiseUpSpeed)
-	{
-		SetCharSpeed(GetCharSpeed() + 50.0f);
-		CurrScoreToRiseUp = 0;
-	}
-	else
-		CurrScoreToRiseUp += Scores;
-}
-
-//ChangeSpeed OverMapProgress
-void ARunnerCharacter::OverProgress()
-{
-	FVector VectorDifference = GetCharacterMovement()->GetLastUpdateLocation() - CoordToRiseSpeed;
-	if (VectorDifference.Size() >= DistanceToRiseUpSpeed)
-	{
-		CoordToRiseSpeed = GetCharacterMovement()->GetLastUpdateLocation();
-		GetCharacterMovement()->MaxWalkSpeed += SpeedRiseValue;
-		if (Debug)
-			UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::OverProgress %f"), CoordToRiseSpeed.Size());
 	}
 }
 
@@ -337,6 +290,15 @@ bool ARunnerCharacter::KillChar()
 		CharDead_BP();
 	}
 	return true;
+}
+
+void ARunnerCharacter::ChangeAnimPlayRate()
+{
+	ChangeAnimPlayRate_BP();
+}
+
+void ARunnerCharacter::ChangeAnimPlayRate_BP_Implementation()
+{
 }
 
 void ARunnerCharacter::CharDead_BP_Implementation()

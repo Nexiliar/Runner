@@ -42,25 +42,9 @@ public:
 		class UArrowComponent* CheckComponent = nullptr;
 
 	/** Editable In BP */
-
 	//Show off debug info
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
 		bool Debug = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
-		ESpeedChangeTypes SpeedChangeTypes = ESpeedChangeTypes::FirstType;
-	//Distance the character need to overcome before he get a speedboost
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
-		float DistanceToRiseUpSpeed = 0.0f;
-	//Amount of boost your speed get after each iteration
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "1200", UIMin = "0", UIMax = "1200"), Category = "RunnerCFG")
-		float SpeedRiseValue = 0.0f;
-	//Need to adjust how often you get speed rise with "Increase Speed OverTime" Mode On
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
-		float TimeUntillSpeedUp = 0.0f;
-	//Scores count the character need to collect before he get a speedboost
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RunnerCFG")
-		int32 AmountOfScoresToRiseUpSpeed = 0;
 
 	// Line shift
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LineShiftCFG")
@@ -111,7 +95,8 @@ public:
 		void ChangeSpeedByBuff(float MulFactor);
 	UFUNCTION(BlueprintCallable)
 		float GetCharSpeed() const;
-
+	UFUNCTION(BlueprintCallable)
+		float GetCharSpeedMinValue() const;
 
 	//SwitchLaneFunctions
 	UFUNCTION(BlueprintCallable)
@@ -123,22 +108,23 @@ public:
 	UFUNCTION()
 		void CheckForCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	//SpeedChangeFunctions
-	void ChangeSpeed();
-	void OverTime();
-	UFUNCTION()
-		void OverScores(int32 Scores);
-	void OverProgress();
-
 	// EndGame
 	UFUNCTION(BlueprintCallable)
 		bool KillChar();
 	UFUNCTION(BlueprintNativeEvent)
 		void CharDead_BP();
 
+	// animation play rate changing
+	UFUNCTION(BlueprintCallable)
+		void ChangeAnimPlayRate();
+	UFUNCTION(BlueprintNativeEvent)
+		void ChangeAnimPlayRate_BP();
+
 protected:
 
 	float SpeedBeforeBuff = 100.f;
+	float SpeedMinVal = 100.f;
+	float SpeedMaxVal = 100.f;
 
 	//Check whether its left or right lane
 	bool bShiftLeft = false;
@@ -160,7 +146,5 @@ protected:
 	bool isOverScores = false;
 	FVector CoordToRiseSpeed;
 
-	bool bUnderBuffEffect = false;
-	bool bUnderDebuffEffect = false;
-
+	bool bSpeedUnderEffect = false;
 };

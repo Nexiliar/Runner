@@ -24,12 +24,13 @@ void ARunnerGameMode::BeginPlay()
 	FActorSpawnParameters GrinchSpawnParams;
 	GrinchSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	Grinch = Cast<AGrinchCharacter>(GetWorld()->SpawnActor(GrinchClass, &GrinchTransform, GrinchSpawnParams));
+	Grinch->SetCharSpeed(StartCharSpeed);
 }
 
 void ARunnerGameMode::SpawnMapPart()
 {
 	GameMap->CreateNewTile();
-	Grinch->SetCharSpeed(Grinch->GetCharSpeed() + 50.f);
+	//Grinch->SetCharSpeed(Grinch->GetCharSpeed() * 1.05f);
 }
 
 void ARunnerGameMode::SpawnBonus()
@@ -42,7 +43,7 @@ void ARunnerGameMode::ChangeScores(int32 Amount)
 {
 	CurrentPoints += Amount;
 	OnScoresChange.Broadcast(Amount);
-	UE_LOG(LogTemp, Warning, TEXT("ARunnerGameMode::ChangeScores  CurrentPoints %i"), CurrentPoints);
+	//UE_LOG(LogTemp, Warning, TEXT("ARunnerGameMode::ChangeScores  CurrentPoints %i"), CurrentPoints);
 }
 
 int32 ARunnerGameMode::GetCurrentScores()

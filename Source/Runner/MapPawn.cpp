@@ -175,7 +175,7 @@ std::pair<ETileType, TSubclassOf<AMapPartBase>> AMapPawn::GetTileType()
 			NewTileClass = AvailableTiles[FMath::RandRange(0, AvailableTiles.Num() - 1)].TileClass;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("AMapPawn::GetTileType: [INfo] NewTyle - %s, Env - %s"), *UEnum::GetValueAsString(NewType), *UEnum::GetValueAsString(CurrentEnv));
+	//UE_LOG(LogTemp, Warning, TEXT("AMapPawn::GetTileType: [INfo] NewTyle - %s, Env - %s"), *UEnum::GetValueAsString(NewType), *UEnum::GetValueAsString(CurrentEnv));
 	return std::make_pair(NewType, NewTileClass);
 }
 
