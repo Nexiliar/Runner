@@ -30,7 +30,7 @@ void ARunnerGameMode::BeginPlay()
 void ARunnerGameMode::SpawnMapPart()
 {
 	GameMap->CreateNewTile();
-	//Grinch->SetCharSpeed(Grinch->GetCharSpeed() * 1.05f);
+	Grinch->SetCharSpeed(Grinch->GetCharSpeed() * 1.02f);
 }
 
 void ARunnerGameMode::SpawnBonus()
