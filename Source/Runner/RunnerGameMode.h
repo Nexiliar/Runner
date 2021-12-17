@@ -25,16 +25,28 @@ public:
 	/** Editable in BP */
 
 	// Map
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapSettings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MainSettings")
 		TSubclassOf<class AMapPawn> MapClass;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapSettings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MainSettings")
 		TSubclassOf<class AGrinchCharacter> GrinchClass;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapSettings")
-		float StartCharSpeed = 800.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapSettings")
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpeedSettings")
+		float StartSpeed = 800.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpeedSettings")
 		float MaxCharSpeed = 1500.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapSettings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpeedSettings")
 		float MinCharSpeed = 600.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpeedSettings")
+		float CharSpeedIncreaseAfterObstacle = 1.05f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpeedSettings")
+		float GrinchMaxSpeed = 1500.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpeedSettings")
+		float GrinchMinSpeed = 800.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpeedSettings")
+		float GrinchSpeedMultiply = 1.05f;
+
 
 	//PickUp Classess to randomly spawn on tile
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapPartSpawningSettings")

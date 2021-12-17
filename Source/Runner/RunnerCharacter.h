@@ -92,7 +92,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void ChangeSpeedByFactor(float MulFactor);
 	UFUNCTION(BlueprintCallable)
-		void ChangeSpeedByBuff(float MulFactor);
+		void ChangeSpeedByBuff(float MulFactor, float EffectTime);
 	UFUNCTION(BlueprintCallable)
 		float GetCharSpeed() const;
 	UFUNCTION(BlueprintCallable)

@@ -24,13 +24,13 @@ void ARunnerGameMode::BeginPlay()
 	FActorSpawnParameters GrinchSpawnParams;
 	GrinchSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	Grinch = Cast<AGrinchCharacter>(GetWorld()->SpawnActor(GrinchClass, &GrinchTransform, GrinchSpawnParams));
-	Grinch->SetCharSpeed(StartCharSpeed);
+	Grinch->SetCharSpeed(StartSpeed);
 }
 
 void ARunnerGameMode::SpawnMapPart()
 {
 	GameMap->CreateNewTile();
-	Grinch->SetCharSpeed(Grinch->GetCharSpeed() * 1.02f);
+	Grinch->SetCharSpeed(Grinch->GetCharSpeed() * GrinchSpeedMultiply);
 }
 
 void ARunnerGameMode::SpawnBonus()

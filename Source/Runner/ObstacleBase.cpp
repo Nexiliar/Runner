@@ -36,10 +36,11 @@ void AObstacleBase::OnComponentHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 	ARunnerCharacter* Player = Cast<ARunnerCharacter>(OtherActor);
 	if (Player)
 	{
-		//Try to find a better solution.
-		if (Hit.Distance < 1.0f)
-		{
-			Player->KillChar();
-		}
+		Player->KillChar();
+		////Try to find a better solution.
+		//if (Hit.Distance < 1.0f)
+		//{
+		//	
+		//}
 	}
 }

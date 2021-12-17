@@ -62,8 +62,8 @@ void AGrinchCharacter::BeginPlay()
 	ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (Gamemode)
 	{
-		MaxMoveSpeed = Gamemode->MaxCharSpeed;
-		MinMoveSpeed = Gamemode->StartCharSpeed;
+		MaxMoveSpeed = Gamemode->GrinchMaxSpeed;
+		MinMoveSpeed = Gamemode->GrinchMinSpeed;
 	}
 }
 

@@ -54,5 +54,7 @@ public:
 		int32 AmountOfScoresGainOnPickUp = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickUpSettings")
-		float SpeedMultiply = 1.0;
+		float SpeedMultiply = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickUpSettings")
+		float EffectTime = 5.0f;
 };

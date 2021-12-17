@@ -134,7 +134,7 @@ void ARunnerCharacter::ChangeSpeedByFactor(float MulFactor)
 	SetCharSpeed(GetCharacterMovement()->MaxWalkSpeed * MulFactor);
 }
 
-void ARunnerCharacter::ChangeSpeedByBuff(float MulFactor)
+void ARunnerCharacter::ChangeSpeedByBuff(float MulFactor, float EffectTime)
 {
 	
 	if (bSpeedUnderEffect)
@@ -154,7 +154,7 @@ void ARunnerCharacter::ChangeSpeedByBuff(float MulFactor)
 	{
 		SetCharSpeed(TempSpeed);
 		// end buf/debuff
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpeedRise, FTimerDelegate::CreateLambda([&] { SetCharSpeed(GetCharSpeed()); bSpeedUnderEffect = false; }), 5.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpeedRise, FTimerDelegate::CreateLambda([&] { SetCharSpeed(GetCharSpeed()); bSpeedUnderEffect = false; }), EffectTime, false);
 
 		// TODO 
 		// broadcast to widget

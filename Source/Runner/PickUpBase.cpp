@@ -47,11 +47,11 @@ void APickUpBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 		}
 		case EDropItem::BUFF:
 		{
-			Char->ChangeSpeedByBuff(SpeedMultiply);
+			Char->ChangeSpeedByBuff(SpeedMultiply, EffectTime);
 			break;
 		}
 		case EDropItem::DEBUFF:
-			Char->ChangeSpeedByBuff(SpeedMultiply);
+			Char->ChangeSpeedByBuff(SpeedMultiply, EffectTime);
 			break;
 		}
 
