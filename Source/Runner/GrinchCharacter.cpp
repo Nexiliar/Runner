@@ -35,14 +35,12 @@ void AGrinchCharacter::DropItem()
 	if (RandSeed % 40 == 0)
 	{
 		// spawn buff
-		if (DropBufsClass.Num() > 0)
-			DropItem = Cast<APickUpBase>(GetWorld()->SpawnActor(DropBufsClass[0], &Transform, SpawnParams));
+		DropItem = Cast<APickUpBase>(GetWorld()->SpawnActor(DropBufsClass, &Transform, SpawnParams));
 	}
 	else if (RandSeed % 33 == 0)
 	{
 		// spawn debuff
-		if (DropDebufsClass.Num() > 0)
-			DropItem = Cast<APickUpBase>(GetWorld()->SpawnActor(DropDebufsClass[0], &Transform, SpawnParams));
+		DropItem = Cast<APickUpBase>(GetWorld()->SpawnActor(DropDebufsClass, &Transform, SpawnParams));
 	}
 	else
 	{

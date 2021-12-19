@@ -17,9 +17,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 		TSubclassOf<class APickUpBase> DropCoinClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
-		TArray<TSubclassOf<class APickUpBase>> DropBufsClass;
+		TSubclassOf<class APickUpBase> DropBufsClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
-		TArray<TSubclassOf<class APickUpBase>> DropDebufsClass;
+		TSubclassOf<class APickUpBase> DropDebufsClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 		float CoinDistanceDrop = 300.0f;
 
