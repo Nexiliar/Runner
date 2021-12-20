@@ -131,7 +131,12 @@ void ARunnerCharacter::SetCharSpeed(float NewSpeed)
 
 void ARunnerCharacter::ChangeSpeedByFactor(float MulFactor)
 {
-	SetCharSpeed(GetCharacterMovement()->MaxWalkSpeed * MulFactor);
+	if (!bSpeedUnderEffect)
+	{
+		SetCharSpeed(GetCharacterMovement()->MaxWalkSpeed * MulFactor);
+		SpeedScale *= MulFactor;
+		ChangeCharSpeedScale_BP();
+	}
 }
 
 void ARunnerCharacter::ChangeSpeedByBuff(float MulFactor, float EffectTime)
@@ -144,17 +149,17 @@ void ARunnerCharacter::ChangeSpeedByBuff(float MulFactor, float EffectTime)
 	}
 	else
 	{
-		SpeedBeforeBuff = GetCharSpeed();
+		SpeedBeforeEffect = GetCharSpeed();
 		bSpeedUnderEffect = true;
 	}
 	
-	float TempSpeed = SpeedBeforeBuff * MulFactor;
+	float TempSpeed = SpeedBeforeEffect * MulFactor;
 	// skip buff/debuff if speed out of range
 	if ((TempSpeed > SpeedMinVal) && (TempSpeed < SpeedMaxVal))
 	{
 		SetCharSpeed(TempSpeed);
 		// end buf/debuff
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpeedRise, FTimerDelegate::CreateLambda([&] { SetCharSpeed(GetCharSpeed()); bSpeedUnderEffect = false; }), EffectTime, false);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpeedRise, FTimerDelegate::CreateLambda([&] { SetCharSpeed(SpeedBeforeEffect); bSpeedUnderEffect = false; }), EffectTime, false);
 
 		// TODO 
 		// broadcast to widget
@@ -171,6 +176,11 @@ float ARunnerCharacter::GetCharSpeed() const
 float ARunnerCharacter::GetCharSpeedMinValue() const
 {
 	return SpeedMinVal;
+}
+
+float ARunnerCharacter::GetCharSpeedScale() const
+{
+	return SpeedScale;
 }
 
 void ARunnerCharacter::SwitchRoadLeft()
@@ -265,7 +275,7 @@ void ARunnerCharacter::CheckForCollision(UPrimitiveComponent* OverlappedComponen
 
 			SetActorLocation(FVector(CurX, ShiftStartPos.Y, ShiftStartPos.Z));
 
-			SetCharSpeed(GetCharSpeed() - 100.f);
+			ChangeSpeedByFactor(0.9);
 
 			// unblock input
 			EnableInputsHandling();
@@ -295,6 +305,10 @@ bool ARunnerCharacter::KillChar()
 void ARunnerCharacter::ChangeAnimPlayRate()
 {
 	ChangeAnimPlayRate_BP();
+}
+
+void ARunnerCharacter::ChangeCharSpeedScale_BP_Implementation()
+{
 }
 
 void ARunnerCharacter::ChangeAnimPlayRate_BP_Implementation()

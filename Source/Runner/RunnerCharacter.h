@@ -97,6 +97,8 @@ public:
 		float GetCharSpeed() const;
 	UFUNCTION(BlueprintCallable)
 		float GetCharSpeedMinValue() const;
+	UFUNCTION(BlueprintCallable)
+		float GetCharSpeedScale() const;
 
 	//SwitchLaneFunctions
 	UFUNCTION(BlueprintCallable)
@@ -120,11 +122,16 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 		void ChangeAnimPlayRate_BP();
 
+	// speed scale chaneged
+	UFUNCTION(BlueprintNativeEvent)
+		void ChangeCharSpeedScale_BP();
+
 protected:
 
-	float SpeedBeforeBuff = 100.f;
+	float SpeedBeforeEffect = 100.f;
 	float SpeedMinVal = 100.f;
 	float SpeedMaxVal = 100.f;
+	float SpeedScale = 1.0f;
 
 	//Check whether its left or right lane
 	bool bShiftLeft = false;
