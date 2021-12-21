@@ -8,7 +8,7 @@
 #include "GrinchCharacter.h"
 #include "RunnerGameMode.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnScoresChange, int32, Scores);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnScoresChange, int32, CurrScores, int32, ScoreChage);
 
 UCLASS(minimalapi)
 class ARunnerGameMode : public AGameModeBase

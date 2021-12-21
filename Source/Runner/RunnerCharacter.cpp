@@ -133,8 +133,13 @@ void ARunnerCharacter::ChangeSpeedByFactor(float MulFactor)
 {
 	if (!bSpeedUnderEffect)
 	{
-		SetCharSpeed(GetCharacterMovement()->MaxWalkSpeed * MulFactor);
-		SpeedScale *= MulFactor;
+		float TempSpeed = GetCharacterMovement()->MaxWalkSpeed * MulFactor;
+		
+		if ((TempSpeed > SpeedMinVal) && (TempSpeed < SpeedMaxVal))
+		{
+			SetCharSpeed(TempSpeed);
+			SpeedScale *= MulFactor;
+		}
 		ChangeCharSpeedScale_BP();
 	}
 }
@@ -158,13 +163,17 @@ void ARunnerCharacter::ChangeSpeedByBuff(float MulFactor, float EffectTime)
 	if ((TempSpeed > SpeedMinVal) && (TempSpeed < SpeedMaxVal))
 	{
 		SetCharSpeed(TempSpeed);
-		// end buf/debuff
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpeedRise, FTimerDelegate::CreateLambda([&] { SetCharSpeed(SpeedBeforeEffect); bSpeedUnderEffect = false; }), EffectTime, false);
-
-		// TODO 
+ 
 		// broadcast to widget
+		OnNewEffect.Broadcast(MulFactor, EffectTime);
+
+		// end buf/debuff
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpeedRise, FTimerDelegate::CreateLambda([&] {
+			SetCharSpeed(SpeedBeforeEffect);
+			bSpeedUnderEffect = false;
+			OnEffectEnd.Broadcast();
+		}), EffectTime, false);
 	}
-	
 }
 
 
@@ -278,6 +287,7 @@ void ARunnerCharacter::CheckForCollision(UPrimitiveComponent* OverlappedComponen
 			ChangeSpeedByFactor(0.9);
 
 			// unblock input
+			bShifting = false;
 			EnableInputsHandling();
 
 			ChangeAnimPlayRate();

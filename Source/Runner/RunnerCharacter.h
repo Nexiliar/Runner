@@ -7,6 +7,8 @@
 #include "Types.h"
 #include "RunnerCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNewEffect, float, SpeedScale, float, EffectTime);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEffectEnd);
 
 UCLASS(config = Game)
 class ARunnerCharacter : public ACharacter
@@ -29,6 +31,12 @@ class ARunnerCharacter : public ACharacter
 
 public:
 	ARunnerCharacter();
+
+	// Events
+	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Effects")
+		FOnNewEffect OnNewEffect;
+	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Effects")
+		FOnEffectEnd OnEffectEnd;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)

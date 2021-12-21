@@ -42,7 +42,7 @@ void ARunnerGameMode::SpawnBonus()
 void ARunnerGameMode::ChangeScores(int32 Amount)
 {
 	CurrentPoints += Amount;
-	OnScoresChange.Broadcast(Amount);
+	OnScoresChange.Broadcast(CurrentPoints, Amount);
 	//UE_LOG(LogTemp, Warning, TEXT("ARunnerGameMode::ChangeScores  CurrentPoints %i"), CurrentPoints);
 }
 
