@@ -105,7 +105,7 @@ void AMapPawn::CreateNewTile()
 	else
 	{
 		NewLocation = MapTail->Tile->ArrowEndLocComp->GetComponentTransform().GetLocation();
-		//UE_LOG(LogTemp, Warning, TEXT("NewLocation is %s"), *NewLocation.ToString());
+		UE_LOG(LogTemp, Warning, TEXT("NewLocation is %s"), *NewLocation.ToString());
 	}
 
 	// set spawn params
@@ -141,7 +141,7 @@ std::pair<ETileType, TSubclassOf<AMapPartBase>> AMapPawn::GetTileType()
 		// use current env until new timer tick
 		bShouldChangeLocation = false;
 
-		UE_LOG(LogTemp, Warning, TEXT("AMapPawn::GetTileType:  ChangeLocation"));
+		//UE_LOG(LogTemp, Warning, TEXT("AMapPawn::GetTileType:  ChangeLocation"));
 	}
 	else if ((PrevTileType == ETileType::None) || (PrevTileType == ETileType::EndEnvTile))
 	{
