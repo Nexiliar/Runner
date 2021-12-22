@@ -115,6 +115,8 @@ public:
 		void SwitchRoadRight();
 	void OffsetCharacterToLane();
 
+	void CorrectPosition();
+
 	UFUNCTION()
 		void CheckForCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 

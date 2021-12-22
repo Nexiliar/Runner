@@ -77,6 +77,9 @@ void ARunnerCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	MoveForward(1.0f);
+
+	if (!bShifting)
+		CorrectPosition();
 }
 
 void ARunnerCharacter::BeginPlay()
@@ -267,6 +270,28 @@ void ARunnerCharacter::OffsetCharacterToLane()
 		AddActorWorldOffset(Offset);
 
 		TimeToShift -= ShiftOffsetAnimTimeRate;
+	}
+}
+
+void ARunnerCharacter::CorrectPosition()
+{
+	float currentY = GetActorLocation().Y;
+	switch (CurrentLine)
+	{
+	case EMovementLine::LINE_1:
+		if (currentY != -300.f)
+			SetActorLocation(FVector(GetActorLocation().X, -300.f, GetActorLocation().Z));
+		break;
+	case EMovementLine::LINE_2:
+		if (currentY != 0.0f)
+			SetActorLocation(FVector(GetActorLocation().X, 0.0f, GetActorLocation().Z));
+		break;
+	case EMovementLine::LINE_3:
+		if (currentY != 300.f)
+			SetActorLocation(FVector(GetActorLocation().X, 300.f, GetActorLocation().Z));
+		break;
+	default:
+		break;
 	}
 }
 
