@@ -42,7 +42,7 @@ void APickUpBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 			ARunnerGameMode* Gamemode = Cast<ARunnerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 			if (Gamemode)
 				Gamemode->ChangeScores(AmountOfScoresGainOnPickUp);
-			Char->SetCharSpeed(Char->GetCharSpeed() * 0.99);
+			//Char->SetCharSpeed(Char->GetCharSpeed() * 0.99);
 
 			break;
 		}

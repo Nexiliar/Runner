@@ -78,7 +78,7 @@ void ARunnerCharacter::Tick(float DeltaSeconds)
 
 	MoveForward(1.0f);
 
-	if (!bShifting)
+	if (!bShifting && (GetCharSpeed() >= SpeedMinVal))
 		CorrectPosition();
 }
 
