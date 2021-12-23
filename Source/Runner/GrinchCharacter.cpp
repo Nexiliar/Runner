@@ -72,23 +72,26 @@ void AGrinchCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	MoveForward();
+	if (bRunning)
+	{
+		MoveForward();
 
-	if (ChangeLineTimer >= TimeToChangeLine)
-	{
-		TryChangeLane();
-		ChangeLineTimer = 0.0f;
+		if (ChangeLineTimer >= TimeToChangeLine)
+		{
+			TryChangeLane();
+			ChangeLineTimer = 0.0f;
+		}
+		else
+			ChangeLineTimer += DeltaTime;
+
+		if (DistToDrop >= CoinDistanceDrop && !bShifting)
+		{
+			DistToDrop = 0.0f;
+			DropItem();
+		}
+		else
+			DistToDrop += GetCharacterMovement()->MaxWalkSpeed * DeltaTime;
 	}
-	else
-		ChangeLineTimer += DeltaTime;
-	
-	if (DistToDrop >= CoinDistanceDrop && !bShifting)
-	{
-		DistToDrop = 0.0f;
-		DropItem();
-	}
-	else
-		DistToDrop += GetCharacterMovement()->MaxWalkSpeed * DeltaTime;
 }
 
 void AGrinchCharacter::SetCharSpeed(float NewSpeed)

@@ -22,6 +22,8 @@ public:
 		TSubclassOf<class APickUpBase> DropDebufsClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 		float CoinDistanceDrop = 300.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+		bool bRunning = true;
 
 public:
 	// Sets default values for this character's properties
