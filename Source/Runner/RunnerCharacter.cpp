@@ -141,7 +141,7 @@ void ARunnerCharacter::ChangeSpeedByFactor(float MulFactor)
 		if ((TempSpeed > SpeedMinVal) && (TempSpeed < SpeedMaxVal))
 		{
 			SetCharSpeed(TempSpeed);
-			SpeedScale *= MulFactor;
+			SpeedScale = SpeedScale * MulFactor;
 		}
 		ChangeCharSpeedScale_BP();
 	}
