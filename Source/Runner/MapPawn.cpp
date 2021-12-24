@@ -175,7 +175,7 @@ std::pair<ETileType, TSubclassOf<AMapPartBase>> AMapPawn::GetTileType()
 			NewTileClass = AvailableTiles[FMath::RandRange(0, AvailableTiles.Num() - 1)].TileClass;
 	}
 
-	//UE_LOG(LogTemp, Warning, TEXT("AMapPawn::GetTileType: [INfo] NewTyle - %s, Env - %s"), *UEnum::GetValueAsString(NewType), *UEnum::GetValueAsString(CurrentEnv));
+	UE_LOG(LogTemp, Warning, TEXT("AMapPawn::GetTileType: [INfo] NewTyle - %s, Env - %s"), *UEnum::GetValueAsString(NewType), *UEnum::GetValueAsString(CurrentEnv));
 	return std::make_pair(NewType, NewTileClass);
 }
 
@@ -190,17 +190,20 @@ ELandscapeType AMapPawn::GetNextEnvironment()
 	int8 i = 0;
 	bool bFind = false;
 	ELandscapeType NewEnv = ELandscapeType::None;
+	ELandscapeType Temp = CurrentEnv;
 	while (i < MapEnvs.Num() && !bFind)
 	{
-		if ((CurrentEnv == ELandscapeType::None) || (CurrentEnv == ELandscapeType::Village))
+		if ((Temp == ELandscapeType::None) || (Temp == ELandscapeType::Village))
 			NewEnv = ELandscapeType::Forest;
-		else if (CurrentEnv == ELandscapeType::Forest)
+		else if (Temp == ELandscapeType::Forest)
 			NewEnv = ELandscapeType::Road;
-		else if (CurrentEnv == ELandscapeType::Road)
+		else if (Temp == ELandscapeType::Road)
 			NewEnv = ELandscapeType::Village;
 
 		if (CheckIfEnvExist(NewEnv))
 			bFind = true;
+
+		Temp = NewEnv;
 
 		i++;
 	}
@@ -210,7 +213,8 @@ ELandscapeType AMapPawn::GetNextEnvironment()
 
 bool AMapPawn::CheckIfEnvExist(ELandscapeType NewEnv)
 {
-	return MapsAllTiles.Contains(NewEnv);
+	bool res = MapsAllTiles.Contains(NewEnv);
+	return res;
 }
 
 void AMapPawn::SpawnObstacle(bool TwoObjects, AMapPartBase* MapTile)

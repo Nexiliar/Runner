@@ -94,6 +94,8 @@ void ARunnerCharacter::BeginPlay()
 	{
 		SpeedMinVal = Gamemode->MinCharSpeed;
 		SpeedMaxVal = Gamemode->MaxCharSpeed;
+		SpeedStartVal = Gamemode->StartSpeed;
+		SpeedMaxScale = Gamemode->MaxCharSpeedScale;
 	}
 }
 
@@ -126,7 +128,7 @@ void ARunnerCharacter::SetCharSpeed(float NewSpeed)
 	if ((NewSpeed <= SpeedMaxVal) && (NewSpeed >= SpeedMinVal))
 	{
 		GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
-		UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::SetCharSpeed - NewSpeed: %f"), NewSpeed);
+		//UE_LOG(LogTemp, Warning, TEXT("ARunnerCharacter::SetCharSpeed - NewSpeed: %f"), NewSpeed);
 
 		ChangeAnimPlayRate();
 	}
@@ -137,11 +139,14 @@ void ARunnerCharacter::ChangeSpeedByFactor(float MulFactor)
 	if (!bSpeedUnderEffect)
 	{
 		float TempSpeed = GetCharacterMovement()->MaxWalkSpeed * MulFactor;
-		
-		if ((TempSpeed > SpeedMinVal) && (TempSpeed < SpeedMaxVal))
+		float NewSpeedScale = SpeedScale * MulFactor;
+
+		//if ((TempSpeed > SpeedMinVal) && (TempSpeed < SpeedMaxVal))
+		if (NewSpeedScale <= SpeedMaxScale)
 		{
-			SetCharSpeed(TempSpeed);
-			SpeedScale = SpeedScale * MulFactor;
+			SetCharSpeed(SpeedStartVal * NewSpeedScale);
+			//SpeedScale = SpeedScale * MulFactor;
+			SpeedScale = NewSpeedScale;
 		}
 		ChangeCharSpeedScale_BP();
 	}
@@ -162,11 +167,18 @@ void ARunnerCharacter::ChangeSpeedByBuff(float MulFactor, float EffectTime)
 	}
 	
 	float TempSpeed = SpeedBeforeEffect * MulFactor;
+	float NewSpeedScale = SpeedScale * MulFactor;
+
 	// skip buff/debuff if speed out of range
-	if ((TempSpeed > SpeedMinVal) && (TempSpeed < SpeedMaxVal))
+	//if ((TempSpeed > SpeedMinVal) && (TempSpeed < SpeedMaxVal))
+	if (NewSpeedScale > SpeedMaxScale)
+		NewSpeedScale = SpeedMaxScale + 0.1f;
+
+
 	{
-		SetCharSpeed(TempSpeed);
- 
+		//SetCharSpeed(TempSpeed);
+		SetCharSpeed(SpeedStartVal * NewSpeedScale);
+
 		// broadcast to widget
 		OnNewEffect.Broadcast(MulFactor, EffectTime);
 
@@ -193,6 +205,12 @@ float ARunnerCharacter::GetCharSpeedMinValue() const
 float ARunnerCharacter::GetCharSpeedScale() const
 {
 	return SpeedScale;
+}
+
+void ARunnerCharacter::DisableCharMovement()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 0.0f;
+	GetCharacterMovement()->DisableMovement();
 }
 
 void ARunnerCharacter::SwitchRoadLeft()

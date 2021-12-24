@@ -108,6 +108,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 		float GetCharSpeedScale() const;
 
+	void DisableCharMovement();
+
 	//SwitchLaneFunctions
 	UFUNCTION(BlueprintCallable)
 		void SwitchRoadLeft();
@@ -138,10 +140,12 @@ public:
 
 protected:
 
+	float SpeedStartVal = 500.0f;
 	float SpeedBeforeEffect = 100.f;
 	float SpeedMinVal = 100.f;
 	float SpeedMaxVal = 100.f;
-	float SpeedScale = 1.0f;
+	float SpeedScale = 1.0f;	
+	float SpeedMaxScale = 2.5f;
 
 	//Check whether its left or right lane
 	bool bShiftLeft = false;

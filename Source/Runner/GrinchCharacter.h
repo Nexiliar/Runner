@@ -32,6 +32,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void DropItem();
 
+	void DisableCharMovement();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -55,11 +57,16 @@ public:
 		void SetCharSpeed(float NewSpeed);
 	UFUNCTION(BlueprintCallable)
 		float GetCharSpeed() const;
+	UFUNCTION(BlueprintCallable)
+		void ChangeSpeedByFactor(float MulFactor);
 
 protected:
 
 	float MaxMoveSpeed = 1500.f;
 	float MinMoveSpeed = 300.f;
+	float MaxSpeedScale = 3.0f;
+	float SpeedScale = 1.0f;
+	float SpeedStartVal = 300.f;
 
 	//SwitchLaneVariables
 	EMovementLine CurrentLine = EMovementLine::LINE_2;

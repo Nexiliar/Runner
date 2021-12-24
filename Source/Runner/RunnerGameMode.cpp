@@ -7,6 +7,25 @@ ARunnerGameMode::ARunnerGameMode()
 {
 }
 
+void ARunnerGameMode::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	float PlayerX = Player->GetActorLocation().X;
+	float GrinchX = Grinch->GetActorLocation().X;
+
+	if (((GrinchX - PlayerX) <= 150) && bGameStarted)
+	{
+		Player->DisableCharMovement();
+		Grinch->DisableCharMovement();
+
+		Grinch->SetActorLocation(Player->GetActorLocation() + FVector(200.f, 0.0f, 0.0f));
+
+		GameEnded_BP();
+	}
+
+}
+
 void ARunnerGameMode::BeginPlay()
 {
 	Super::BeginPlay();
@@ -25,12 +44,15 @@ void ARunnerGameMode::BeginPlay()
 	GrinchSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	Grinch = Cast<AGrinchCharacter>(GetWorld()->SpawnActor(GrinchClass, &GrinchTransform, GrinchSpawnParams));
 	Grinch->SetCharSpeed(StartSpeed);
+
+	Player = Cast<ARunnerCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 }
 
 void ARunnerGameMode::SpawnMapPart()
 {
 	GameMap->CreateNewTile();
-	Grinch->SetCharSpeed(Grinch->GetCharSpeed() * GrinchSpeedMultiply);
+	//Grinch->SetCharSpeed(Grinch->GetCharSpeed() * GrinchSpeedMultiply);
+	Grinch->ChangeSpeedByFactor(GrinchSpeedMultiply);
 }
 
 void ARunnerGameMode::SpawnBonus()
@@ -49,4 +71,18 @@ void ARunnerGameMode::ChangeScores(int32 Amount)
 int32 ARunnerGameMode::GetCurrentScores()
 {
 	return CurrentPoints;
+}
+
+void ARunnerGameMode::StartGame()
+{
+	bGameStarted = true;
+}
+
+void ARunnerGameMode::StopGame()
+{
+	bGameStarted = false;
+}
+
+void ARunnerGameMode::GameEnded_BP_Implementation()
+{
 }

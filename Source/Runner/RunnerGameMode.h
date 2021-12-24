@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "MapPawn.h"
 #include "GrinchCharacter.h"
+#include "RunnerCharacter.h"
 #include "RunnerGameMode.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnScoresChange, int32, CurrScores, int32, ScoreChage);
@@ -17,6 +18,9 @@ class ARunnerGameMode : public AGameModeBase
 
 public:
 	ARunnerGameMode();
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 	// Events
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Scores")
@@ -34,18 +38,22 @@ public:
 		float StartSpeed = 800.f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpeedSettings")
-		float MaxCharSpeed = 1500.f;
+		float MaxCharSpeed = 3000.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpeedSettings")
 		float MinCharSpeed = 600.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpeedSettings")
 		float CharSpeedIncreaseAfterObstacle = 1.05f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpeedSettings")
+		float MaxCharSpeedScale = 2.5f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpeedSettings")
-		float GrinchMaxSpeed = 1500.0f;
+		float GrinchMaxSpeed = 3000.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpeedSettings")
 		float GrinchMinSpeed = 800.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpeedSettings")
 		float GrinchSpeedMultiply = 1.05f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpeedSettings")
+		float GrinchSpeedMaxScale = 2.5f;
 
 
 	//PickUp Classess to randomly spawn on tile
@@ -72,8 +80,19 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Points")
 		int32 GetCurrentScores();
 
+	UFUNCTION(BlueprintCallable)
+		void StartGame();
+	UFUNCTION(BlueprintCallable)
+		void StopGame();
+
+	UFUNCTION(BlueprintNativeEvent)
+		void GameEnded_BP();
+
 protected:
 	int32 CurrentPoints;
+	bool bGameStarted = false;
+
+	ARunnerCharacter* Player = nullptr;
 	AMapPawn* GameMap = nullptr;
 	AGrinchCharacter* Grinch = nullptr;
 };

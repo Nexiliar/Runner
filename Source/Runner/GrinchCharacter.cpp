@@ -62,6 +62,8 @@ void AGrinchCharacter::BeginPlay()
 	{
 		MaxMoveSpeed = Gamemode->GrinchMaxSpeed;
 		MinMoveSpeed = Gamemode->GrinchMinSpeed;
+		MaxSpeedScale = Gamemode->GrinchSpeedMaxScale;
+		SpeedStartVal = Gamemode->StartSpeed;
 	}
 }
 
@@ -99,12 +101,29 @@ void AGrinchCharacter::SetCharSpeed(float NewSpeed)
 	if (NewSpeed >= MinMoveSpeed && NewSpeed <= MaxMoveSpeed)
 		GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
 
-	UE_LOG(LogTemp, Warning, TEXT("AGrinchCharacter::SetCharSpeed - NewSpeed: %f"), GetCharSpeed());
+	//UE_LOG(LogTemp, Warning, TEXT("AGrinchCharacter::SetCharSpeed - NewSpeed: %f"), GetCharSpeed());
 }
 
 float AGrinchCharacter::GetCharSpeed() const
 {
 	return GetCharacterMovement()->MaxWalkSpeed;
+}
+
+void AGrinchCharacter::ChangeSpeedByFactor(float MulFactor)
+{
+	float NewSpeedScale = SpeedScale * MulFactor;
+	if (NewSpeedScale <= MaxSpeedScale)
+	{
+		SetCharSpeed(SpeedStartVal * NewSpeedScale);
+		SpeedScale = NewSpeedScale;
+	}
+}
+
+void AGrinchCharacter::DisableCharMovement()
+{
+	bRunning = false;
+	GetCharacterMovement()->MaxWalkSpeed = 0.0f;
+	GetCharacterMovement()->DisableMovement();
 }
 
 void AGrinchCharacter::MoveForward()
