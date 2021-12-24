@@ -136,20 +136,22 @@ void ARunnerCharacter::SetCharSpeed(float NewSpeed)
 
 void ARunnerCharacter::ChangeSpeedByFactor(float MulFactor)
 {
-	if (!bSpeedUnderEffect)
+	float NewSpeedScale = SpeedScale * MulFactor;
+	if (bSpeedUnderEffect)
 	{
-		float TempSpeed = GetCharacterMovement()->MaxWalkSpeed * MulFactor;
-		float NewSpeedScale = SpeedScale * MulFactor;
-
-		//if ((TempSpeed > SpeedMinVal) && (TempSpeed < SpeedMaxVal))
-		if (NewSpeedScale <= SpeedMaxScale)
-		{
-			SetCharSpeed(SpeedStartVal * NewSpeedScale);
-			//SpeedScale = SpeedScale * MulFactor;
-			SpeedScale = NewSpeedScale;
-		}
-		ChangeCharSpeedScale_BP();
+		NewSpeedScale *= SpeedEffectFacot;
 	}
+
+	float TempSpeed = GetCharacterMovement()->MaxWalkSpeed * MulFactor;
+
+	//if ((TempSpeed > SpeedMinVal) && (TempSpeed < SpeedMaxVal))
+	if (NewSpeedScale <= SpeedMaxScale)
+	{
+		SetCharSpeed(SpeedStartVal * NewSpeedScale);
+		//SpeedScale = SpeedScale * MulFactor;
+		SpeedScale = NewSpeedScale;
+	}
+	ChangeCharSpeedScale_BP();
 }
 
 void ARunnerCharacter::ChangeSpeedByBuff(float MulFactor, float EffectTime)
@@ -178,13 +180,14 @@ void ARunnerCharacter::ChangeSpeedByBuff(float MulFactor, float EffectTime)
 	{
 		//SetCharSpeed(TempSpeed);
 		SetCharSpeed(SpeedStartVal * NewSpeedScale);
-
+		SpeedEffectFacot = MulFactor;
+		
 		// broadcast to widget
 		OnNewEffect.Broadcast(MulFactor, EffectTime);
 
 		// end buf/debuff
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpeedRise, FTimerDelegate::CreateLambda([&] {
-			SetCharSpeed(SpeedBeforeEffect);
+			SetCharSpeed(SpeedStartVal * (SpeedScale / SpeedEffectFacot));
 			bSpeedUnderEffect = false;
 			OnEffectEnd.Broadcast();
 		}), EffectTime, false);

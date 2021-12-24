@@ -168,4 +168,5 @@ protected:
 	FVector CoordToRiseSpeed;
 
 	bool bSpeedUnderEffect = false;
+	float SpeedEffectFacot = 1.0f;
 };
